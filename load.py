@@ -12,10 +12,9 @@ def load(path):
     for line in f:
         splitted=line.split(',')
         features.append([float(i) for i in splitted[:-1]])
-        labels.append(splitted[-2:-1])
+        labels.append(int(splitted[-1]))
     labels=np.array(labels)
     features=np.array(features)
-    print(labels)
     return features.T, labels 
         
 
