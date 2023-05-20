@@ -10,11 +10,12 @@ def MVG_model(D,L):
     means = []
     S_matrices = []
    
+    print(L)
     for i in range(D.shape[1]):
         if L[i] == 0:
             print("entra in L[i]==0")
             c0.append(D[:,i])
-        elif L[i] == 1:
+        else :
             print("entra in L[i]==1")
             c1.append(D[:,i])
        
