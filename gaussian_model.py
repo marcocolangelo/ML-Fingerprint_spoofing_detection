@@ -1,5 +1,5 @@
 import numpy as np
-
+import matplotlib.pyplot as plt
 def vcol(v):
     return v.reshape((v.size,1))
 def vrow(v):
@@ -32,7 +32,17 @@ def loglikelihood(XND,mu,sigma):
         logn+=logi[i]
     return logn
 
+def conf_plot(X,m,C):
+
+    plt.figure()
+    plt.hist(X.ravel(),bins=50,density=True)
+    XPlot=np.linspace(-8,12,1000)
+    plt.plot(XPlot.ravel(),np.exp(logpdf_GAU_ND(vrow(XPlot), m, C)))
+    plt.show()
+
 def gaussian_model(dataset,labels):
     mu=vcol(dataset.mean(1))
     sigma=cov(dataset,mu)
     ll=loglikelihood(dataset,mu,sigma)
+    conf_plot(dataset,mu,sigma)
+    
