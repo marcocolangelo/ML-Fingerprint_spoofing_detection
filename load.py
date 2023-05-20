@@ -26,6 +26,6 @@ def load(pathT,pathE):
     LTE=np.array(LTE)
     fT.close()
     fE.close()
-    return (DTR.T, LTR),(DTE.T,LTE)
+    return (DTR, LTR),(DTE,LTE)
         
 
