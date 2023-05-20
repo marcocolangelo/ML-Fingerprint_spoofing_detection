@@ -1,4 +1,4 @@
-import lab04_part2 as lb04
+import Gaussian_model.lab04_part2 as lb04
 import numpy as np
 import scipy as sc
 
@@ -6,39 +6,41 @@ import scipy as sc
 def MVG_model(D,L):
     c0 = []
     c1 = []
-    c2 = []
+    
     means = []
     S_matrices = []
-    
+   
     for i in range(D.shape[1]):
         if L[i] == 0:
+            print("entra in L[i]==0")
             c0.append(D[:,i])
         elif L[i] == 1:
+            print("entra in L[i]==1")
             c1.append(D[:,i])
-        elif L[i] == 2:
-            c2.append(D[:,i])
-    
+       
+
 
     c0 = (np.array(c0)).T
     c1 = (np.array(c1)).T        
-    c2 = (np.array(c2)).T    
-
+    
+    print(c0)
+    
     c0_cent = lb04.centerData(c0)
     c1_cent = lb04.centerData(c1)
-    c2_cent = lb04.centerData(c2)
+   
     
     #you can find optimizations for this part in Lab03
     
     S_matrices.append(lb04.createCenteredCov(c0_cent)) 
     S_matrices.append(lb04.createCenteredCov(c1_cent))
-    S_matrices.append(lb04.createCenteredCov(c2_cent))         
+            
     
     means.append(lb04.vcol(c0.mean(1)))
     means.append(lb04.vcol(c1.mean(1)))
-    means.append(lb04.vcol(c2.mean(1)))
+   
     
     
-    return means,S_matrices,(c0.shape[1],c1.shape[1],c2.shape[1])
+    return means,S_matrices,(c0.shape[1],c1.shape[1])
 
 def TCG_model(D,L):
 
@@ -63,17 +65,16 @@ def TCG_model(D,L):
 def loglikelihoods(DTE,means,S_matrices):
     ll0 = []
     ll1 = []
-    ll2 = []
+    
     
     for i in range(DTE.shape[1]):
             ll0.append(lb04.loglikelihood(DTE[:,i:i+1] , means[0], S_matrices[0]))
         
             ll1.append(lb04.loglikelihood(DTE[:,i:i+1], means[1], S_matrices[1]))
             
-            ll2.append(lb04.loglikelihood(DTE[:,i:i+1], means[2], S_matrices[2]))    
-        
+              
     
-    return np.array((ll0, ll1,ll2))
+    return np.array((ll0, ll1))
 
 
 def posterior_prob(SJoint):
@@ -122,7 +123,7 @@ def evaluation(pred,LTE) :
     
     return acc,tot-corr
 
-def MVG_approach(D,L,DTE):
+def MVG_approach(D,L,DTE,Pc):
     #remember iris dataset is characterized by elements with 4 characteristics split up into 3 classes
     
     #using the functions built in lab04 we can create the several muc and Sc for the MVG model
@@ -134,7 +135,7 @@ def MVG_approach(D,L,DTE):
     log_score_matrix = loglikelihoods(DTE,means,S_matrices)
     
     #adopting broadcasting we can compute JOINT DISTRIBUTION PROBABILITY fx,c(xt,c) = fx|c(xt|c)*Pc(c)
-    Pc = 1/3 #we assume all class' Pc(c) are the same 
+    #Pc = 1/3 #we assume all class' Pc(c) are the same 
     #for a misunderstanding thing whit the cov-matrix I called the S matrix sm_joint 
     sm_joint = np.exp(log_score_matrix)*Pc
 
@@ -156,7 +157,7 @@ def MVG_approach(D,L,DTE):
 
 
 
-def NB_approach(D,L,DTE):
+def NB_approach(D,L,DTE,Pc):
     #remember iris dataset is characterized by elements with 4 characteristics split up into 3 classes
     
     #using the functions built in lab04 we can create the several muc and Sc for the MVG model
@@ -171,7 +172,7 @@ def NB_approach(D,L,DTE):
     log_score_matrix = loglikelihoods(DTE,means,S_matrices)
     
     #adopting broadcasting we can compute JOINT DISTRIBUTION PROBABILITY fx,c(xt,c) = fx|c(xt|c)*Pc(c)
-    Pc = 1/3 #we assume all class' Pc(c) are the same 
+    #Pc = 1/3 #we assume all class' Pc(c) are the same 
     #for a misunderstanding thing whit the cov-matrix I called the S matrix sm_joint 
     sm_joint = np.exp(log_score_matrix)*Pc
 
@@ -191,7 +192,7 @@ def NB_approach(D,L,DTE):
     
     return log_pred
 
-def TCG_approach(D,L,DTE):
+def TCG_approach(D,L,DTE,Pc):
     
     
     means,S_matrix = TCG_model(D,L) #3 means and 1 S_matrix -> tied matrix because of strong dipendence among the classes
@@ -202,7 +203,7 @@ def TCG_approach(D,L,DTE):
     log_score_matrix = loglikelihoods(DTE,means,S_matrices)
     
     #adopting broadcasting we can compute JOINT DISTRIBUTION PROBABILITY fx,c(xt,c) = fx|c(xt|c)*Pc(c)
-    Pc = 1/3 #we assume all class' Pc(c) are the same 
+    #Pc = 1/3 #we assume all class' Pc(c) are the same 
     #for a misunderstanding thing whit the cov-matrix I called the S matrix sm_joint 
     sm_joint = np.exp(log_score_matrix)*Pc
 
@@ -225,7 +226,7 @@ def TCG_approach(D,L,DTE):
 
     return log_pred
 
-def TCNBG_approach(D,L,DTE):
+def TCNBG_approach(D,L,DTE,Pc):
     means,S_matrix = TCG_model(D,L) #3 means and 1 S_matrix -> tied matrix because of strong dipendence among the classes
     
     S_matrix = S_matrix * np.eye(S_matrix.shape[0],S_matrix.shape[1])
@@ -235,15 +236,13 @@ def TCNBG_approach(D,L,DTE):
     log_score_matrix = loglikelihoods(DTE,means,S_matrices)
     
     #adopting broadcasting we can compute JOINT DISTRIBUTION PROBABILITY fx,c(xt,c) = fx|c(xt|c)*Pc(c)
-    Pc = 1/3 #we assume all class' Pc(c) are the same 
+    #Pc = 1/3 #we assume all class' Pc(c) are the same 
     #for a misunderstanding thing whit the cov-matrix I called the S matrix sm_joint 
     sm_joint = np.exp(log_score_matrix)*Pc
-    SJoint_sol = np.load('SJoint_TiedMVG.npy')
+   
     
     log_sm_joint = log_score_matrix + np.log(Pc)
-    log_sm_joint_sol = np.load('logSJoint_TiedMVG.npy')
-    
-    log_marginal_sol = np.load('logMarginal_TiedMVG.npy')
+   
     
     #let's compute the POSTERIOR PROBABILITY P(C=c| X = xt) = fx,c(xt,c)/sm_joint.sum(0)
     #be careful! These functions below return prediction labels yet! The Posterio probability 
