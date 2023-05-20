@@ -1,4 +1,5 @@
 from load import *
 
 if __name__=='__main__':
-    features,labels=load('project\Train.txt')
+    (DTR,LTR), (DTE,LTE)=load('project\Train.txt','project\Test.txt')
+    
