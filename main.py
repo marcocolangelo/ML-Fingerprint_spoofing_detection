@@ -2,11 +2,16 @@ from load import *
 from features_analysis.feature_analysis import *
 from features_analysis.PCA import *
 from features_analysis.LDA import *
+from Gaussian_model.new_MVG_model import *
+from Gaussian_model.MVG_density import *
 
 if __name__=='__main__':
     (DTR,LTR), (DTE,LTE)=loadTrainTest('dataset\Train.txt','dataset\Test.txt')
     DTR = DTR.T
     LTR = LTR.T
+    DTE = DTE.T
+    
+############################      DATA ANALISYS         ############################ 
     
     #plotSingle(DTR, LTR,10)
     # plotCross(DTR, LTR,10)
@@ -34,4 +39,24 @@ if __name__=='__main__':
     
 ## PCA and variance plot
     PCA_plot(DTR)
+    
+############################       MODEL EVALUATION         ############################ 
+
+log_pred_MVG = MVG_approach(DTR, LTR, 0.5, DTE, LTE)
+acc_MVG,_= evaluation(log_pred_MVG,LTE)
+inacc_MVG = 1-acc_MVG
+print(inacc_MVG*100)
+
+log_pred_NB = NB_approach(DTR, LTR, 0.5, DTE, LTE)
+acc_NB,_= evaluation(log_pred_NB,LTE)
+inacc_NB = 1-acc_NB
+print(inacc_NB*100)
+
+log_pred_TCG = TCG_approach(DTR, LTR, 0.5, DTE, LTE)
+acc_TCG,_= evaluation(log_pred_TCG,LTE)
+inacc_TCG = 1-acc_TCG
+print(inacc_TCG*100)
+
+
+
     

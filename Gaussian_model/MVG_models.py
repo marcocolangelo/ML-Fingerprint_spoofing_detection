@@ -1,4 +1,4 @@
-import Gaussian_model.lab04_part2 as lb04
+import MVG_density as MVGd
 import numpy as np
 import scipy as sc
 
@@ -10,7 +10,7 @@ def MVG_model(D,L):
     means = []
     S_matrices = []
    
-    print(L)
+    # print(L)
     for i in range(D.shape[1]):
         if L[i] == 0:
             print("entra in L[i]==0")
@@ -24,20 +24,20 @@ def MVG_model(D,L):
     c0 = (np.array(c0)).T
     c1 = (np.array(c1)).T        
     
-    print(c0)
+    # print(c0)
     
-    c0_cent = lb04.centerData(c0)
-    c1_cent = lb04.centerData(c1)
+    c0_cent = MVGd.centerData(c0)
+    c1_cent = MVGd.centerData(c1)
    
     
     #you can find optimizations for this part in Lab03
     
-    S_matrices.append(lb04.createCenteredCov(c0_cent)) 
-    S_matrices.append(lb04.createCenteredCov(c1_cent))
+    S_matrices.append(MVGd.createCenteredCov(c0_cent)) 
+    S_matrices.append(MVGd.createCenteredCov(c1_cent))
             
     
-    means.append(lb04.vcol(c0.mean(1)))
-    means.append(lb04.vcol(c1.mean(1)))
+    means.append(MVGd.vcol(c0.mean(1)))
+    means.append(MVGd.vcol(c1.mean(1)))
    
     
     
@@ -52,7 +52,7 @@ def TCG_model(D,L):
     
     S_matrices = np.array(S_matrices)
     
-    D_cent = lb04.centerData(D)
+    D_cent = MVGd.centerData(D)
     
     for i in range(cN.shape[0]):
         
@@ -69,9 +69,9 @@ def loglikelihoods(DTE,means,S_matrices):
     
     
     for i in range(DTE.shape[1]):
-            ll0.append(lb04.loglikelihood(DTE[:,i:i+1] , means[0], S_matrices[0]))
+            ll0.append(MVGd.loglikelihood(DTE[:,i:i+1] , means[0], S_matrices[0]))
         
-            ll1.append(lb04.loglikelihood(DTE[:,i:i+1], means[1], S_matrices[1]))
+            ll1.append(MVGd.loglikelihood(DTE[:,i:i+1], means[1], S_matrices[1]))
             
               
     
@@ -81,7 +81,7 @@ def loglikelihoods(DTE,means,S_matrices):
 def posterior_prob(SJoint):
     
     # Calcola le densità marginali sommando le probabilità congiunte su tutte le classi
-    SMarginal = lb04.vrow(SJoint.sum(axis=0))
+    SMarginal = MVGd.vrow(SJoint.sum(axis=0))
     
     # Calcola le probabilità posteriori di classe dividendo le probabilità congiunte per le densità marginali
     SPost = SJoint / SMarginal
@@ -94,7 +94,7 @@ def posterior_prob(SJoint):
 def log_post_prob(log_SJoint):
         
 
-    log_SMarginal = lb04.vrow(sc.special.logsumexp(log_SJoint,axis=0))
+    log_SMarginal = MVGd.vrow(sc.special.logsumexp(log_SJoint,axis=0))
     #print(np.abs(log_SMarginal - log_SMarginal_sol).max())
     
     #print(log_SMarginal.shape)
@@ -293,7 +293,7 @@ def LOO(D,L):
         return np.array(MVG_pred),np.array(NB_pred),np.array(TCG_pred),np.array(TCNBG_pred)
     
     
-# if __name__ == "__main__":
+# Prova funzioni:
    
     
 #     pred_MVG = MVG_approach(DTR,LTR,DTE)

@@ -47,6 +47,7 @@ def logpdf_GAU_ND_1Sample(x,mu,C):
 
 def logpdf_GAU_ND(X,mu,C):          #logpdf_GAU_ND algorithm for a 2-D matrix
     logN = []
+    #print("Dim di X in logpdf_GAU_ND: "+str(X.shape))
     for i in range(X.shape[1]):
         #[:,i:i+1] notation allows us to take just the i-th column at time
         #remember that with this notation we mean [i,i+1) (left-extreme not included)
@@ -74,7 +75,7 @@ def conf_plot(X,m,C):
     XPlot=np.linspace(-8,12,1000)
     plt.plot(XPlot.ravel(),np.exp(logpdf_GAU_ND(vrow(XPlot), m, C)))
     
-# if __name__ == "__main__":
+# Prova funzioni :
     
 #    X1D = np.load("./X1D.npy") 
 #    XND = np.load("./XND.npy")
