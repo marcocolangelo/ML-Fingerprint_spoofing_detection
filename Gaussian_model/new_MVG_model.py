@@ -142,7 +142,7 @@ def MVG_approach(D,L,Pc,DTE,LTE):
     # acc_2,_=evaluation(log_pred,LTE)
     # inacc = 1-acc
     
-    return log_pred
+    return log_pred,
 
 
 

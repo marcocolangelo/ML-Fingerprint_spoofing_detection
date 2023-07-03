@@ -42,7 +42,7 @@ def PCA_impl(D, m):
     P = createP(C, m)
     DP = np.dot(P.T, D)
     
-    return DP
+    return DP,P
 
 def PCA_plot(D):
     # Calcola i valori propri della matrice di covarianza

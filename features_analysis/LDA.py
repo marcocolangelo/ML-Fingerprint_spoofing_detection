@@ -94,7 +94,7 @@ def LDA2(D,L,m):
 def LDA_impl(D,L,m) :
     W1 = LDA1(D,L,m)
     DW = np.dot(W1.T,D)     #D projection on sub-space W1
-    return DW
+    return DW,W1
 
     # W2 = LDA2(D,L,m)
     # DW2 = np.dot(W2.T,D) 
