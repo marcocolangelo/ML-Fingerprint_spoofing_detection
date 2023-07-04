@@ -101,7 +101,7 @@ def Bayes_plot(llr,LTE):
     return DCF_effPrior,DCF_effPrior_min
 
 #should return DCF_norm NOT CALIBRATED
-def opt_bayes_impl(llr,label,prior,Cfp,Cfn):
+def DCF_norm_impl(llr,label,prior,Cfp,Cfn):
       #optimal bayes decision for inf-par binary problem 
         # infpar_llr = np.load("Data\commedia_llr_infpar_eps1.npy")
         # infpar_label =np.load("Data\commedia_labels_infpar_eps1.npy")
@@ -118,9 +118,36 @@ def opt_bayes_impl(llr,label,prior,Cfp,Cfn):
         DCFu = binary_DCFu(prior,Cfn,Cfp,cm)
         #let's compute DCF now, normalizing DCFu with a dummy system DCFu
         dummy_DCFu = min(prior*Cfn,(1-prior)*Cfp)
+        print("dummy DCF: "+str(dummy_DCFu))
+        print("DCFu : "+str(DCFu));
         DCF_norm = DCFu/dummy_DCFu
         
         return DCF_norm
+    
+def DCF_min_impl(llr,label,prior,Cfp,Cfn):
+    post_prob = binary_posterior_prob(llr,prior,Cfn,Cfp)
+    thresholds = np.sort(post_prob)
+    DCF_tresh = []
+    dummy_DCFu = min(prior*Cfn,(1-prior)*Cfp)
+    print("shape di post prob in DCF_min: "+str(post_prob.shape))
+    
+    #iteration over all the possible threshold values
+    for t in thresholds:
+        #I consider t (and not prior) as threshold value for split up the dataset in the two classes' set
+        
+        pred = [1 if x >= t else 0 for x in post_prob]
+        #I compute the confusion_matrix starting from these new results
+        cm = confusion_matrix(pred, label)
+        #I save the normalized DCU computed for each t value
+        DCF_tresh.append(binary_DCFu(prior, Cfn, Cfp, cm)/dummy_DCFu)
+        
+    #I choose the minimum DCF value and the relative threshold value
+    min_DCF = min(DCF_tresh)
+    t_min = thresholds[np.argmin(DCF_tresh)]
+    
+    #Observe how much loss due to poor calibration (the difference is clear if you compare DCF_norm with min_DCF)
+    
+    return min_DCF,t_min,thresholds
     
 
 # if __name__ == "__main__":
@@ -158,25 +185,25 @@ def opt_bayes_impl(llr,label,prior,Cfp,Cfn):
 #     DCF_norm = DCFu/dummy_DCFu
     
 #     #minimum detection costs, we use the llr scores as possible threshold values to iterate over
-#     thresholds = np.sort(infpar_post_prob)
-#     DCF_tresh = []
+    # thresholds = np.sort(infpar_post_prob)
+    # DCF_tresh = []
     
     
-#     #iteration over all the possible threshold values
-#     for t in thresholds:
-#         #I consider t (and not prior) as threshold value for split up the dataset in the two classes' set
-#         pred = [1 if x >= t else 0 for x in infpar_post_prob]
-#         #I compute the confusion_matrix starting from these new results
-#         cm = confusion_matrix(pred, infpar_label)
-#         #I save the normalized DCU computed for each t value
-#         DCF_tresh.append(binary_DCFu(prior, Cfn, Cfp, cm)/dummy_DCFu)
+    # #iteration over all the possible threshold values
+    # for t in thresholds:
+    #     #I consider t (and not prior) as threshold value for split up the dataset in the two classes' set
+    #     pred = [1 if x >= t else 0 for x in infpar_post_prob]
+    #     #I compute the confusion_matrix starting from these new results
+    #     cm = confusion_matrix(pred, infpar_label)
+    #     #I save the normalized DCU computed for each t value
+    #     DCF_tresh.append(binary_DCFu(prior, Cfn, Cfp, cm)/dummy_DCFu)
         
-#     #I choose the minimum DCF value and the relative threshold value
-#     min_DCF = min(DCF_tresh)
-#     t_min = thresholds[np.argmin(DCF_tresh)]
+    # #I choose the minimum DCF value and the relative threshold value
+    # min_DCF = min(DCF_tresh)
+    # t_min = thresholds[np.argmin(DCF_tresh)]
     
-#     #Observe how much loss due to poor calibration (the difference is clear if you compare DCF_norm with min_DCF)
-#     misc_loss = DCF_norm - min_DCF  
+    # #Observe how much loss due to poor calibration (the difference is clear if you compare DCF_norm with min_DCF)
+    # misc_loss = DCF_norm - min_DCF  
     
 #     #ROC to see how much FPR and TPR change according to the chosen threshold value 
 #     ROC_plot(thresholds,infpar_post_prob,infpar_label)

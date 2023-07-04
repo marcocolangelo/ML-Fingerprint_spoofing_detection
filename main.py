@@ -115,11 +115,17 @@ if __name__=='__main__':
 prior,Cfp,Cfn = (0.5,10,1)
 means,S_matrices,_ = MVG_model(DTR,LTR) #3 means and 3 S_matrices -> 1 for each class (3 classes)
 ll0,ll1 = loglikelihoods(DTE,means,S_matrices)
-llr = ll1/ll0
-#verifica se devi usare LTE o LTR
+llr = ll1-ll0
 
-## NON SEMBRA RITORNARE UN VALORE SENSATO!
-DCF_norm = opt_bayes_impl(llr, LTE, prior, Cfp, Cfn)
+#evaluation with DCF
+post_prob = binary_posterior_prob(llr,prior,Cfn,Cfp)
+#DCF_norm = DCF_norm_impl(llr, LTE, prior, Cfp, Cfn)
+#DCF_min,t_min,thresholds = DCF_min_impl(llr, LTE, prior, Cfp, Cfn)
+thresholds = np.sort(post_prob)
+ROC_plot(thresholds, post_prob, LTE)
+Bayes_DCF,Bayes_DCF_min = Bayes_plot(llr,label)
+print("DCF_norm: "+str(DCF_norm))
+print("DCF_min: "+str(DCF_min)+" con t: "+str(t_min))
 
 
 
