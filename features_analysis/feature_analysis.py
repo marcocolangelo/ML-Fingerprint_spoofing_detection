@@ -35,8 +35,8 @@ def plotSingle(D, L, m):
         plt.figure()
         plt.xlabel("Feature " + str(i))
         plt.ylabel("Number of elements")
-        plt.hist(D0[i, :], density=True, alpha=0.7, label="Spoofed fingerprint")
-        plt.hist(D1[i, :], density=True, alpha=0.7, label="Authentic fingerprint")
+        plt.hist(D0[i, :], bins=60,density=True, alpha=0.7, label="Spoofed fingerprint")
+        plt.hist(D1[i, :], bins=60, density=True, alpha=0.7, label="Authentic fingerprint")
         plt.legend()
         plt.show()
         

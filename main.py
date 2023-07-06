@@ -4,7 +4,10 @@ from features_analysis.PCA import *
 from features_analysis.LDA import *
 from Gaussian_model.new_MVG_model import *
 from Gaussian_model.MVG_density import *
+from Gaussian_model.class_MVG import *
 from evaluation_functions.evaluation import *
+from validation.k_fold import *
+
 
 if __name__=='__main__':
     (DTR,LTR), (DTE,LTE)=loadTrainTest('dataset\Train.txt','dataset\Test.txt')
@@ -19,8 +22,8 @@ if __name__=='__main__':
     DC = centerData(DTR)              #delete the mean component from the data
     
 ## plot the features
-    #plotSingle(DC, LTR,10)
-    #plotCross(DC, LTR,10)
+    # plotSingle(DC, LTR,10)
+    # plotCross(DC, LTR,10)
        
     mp = 6
 ## PCA implementation
@@ -48,26 +51,45 @@ if __name__=='__main__':
 ## PCA and variance plot
     PCA_plot(DTR)
     
-############################       MODEL EVALUATION         ############################ 
+############################       K-FOLD                 ############################
+prior,Cfp,Cfn = (0.5,10,1)
+options={"K":5,
+          "pca":6,
+          "pi":0.5,
+          "costs":(1,10)}
+
+MVG_obj = GaussClass("MVG")
+NB_obj = GaussClass("NB")
+TCG_obj = GaussClass("TCG")
+
+min_DCF, scores, labels = kfold(DTR, LTR, MVG_obj,options)
+print("DCFmin per "+"MVG: "+str(min_DCF))
+min_DCF, scores, labels = kfold(DTR, LTR, NB_obj,options)
+print("DCFmin per "+"NB: "+str(min_DCF))
+min_DCF, scores, labels = kfold(DTR, LTR, TCG_obj,options)
+print("DCFmin per "+"TCG: "+str(min_DCF))
+
+
+############################       MODEL BUILDING         ############################ 
 
 # ##MVG
 # log_pred_MVG = MVG_approach(DTR, LTR, 0.5, DTE, LTE)
-# acc_MVG,_= evaluation(log_pred_MVG,LTE)
+# acc_MVG,_= accuracy(log_pred_MVG,LTE)
 # inacc_MVG = 1-acc_MVG
 # print("Error rate MVG no PCA : "+str(inacc_MVG*100))
 
 # log_pred_MVG = MVG_approach(DP, LTR, 0.5, DTEP, LTE)
-# acc_MVG,_= evaluation(log_pred_MVG,LTE)
+# acc_MVG,_= accuracy(log_pred_MVG,LTE)
 # inacc_MVG = 1-acc_MVG
 # print("Error rate MVG PCA con mp = "+ str(mp)+ " ml: "+ str(ml) +" : "+str(inacc_MVG*100))
 
 # # log_pred_MVG = MVG_approach(DW, LTR, 0.5, DTEW, LTE)
-# # acc_MVG,_= evaluation(log_pred_MVG,LTE)
+# # acc_MVG,_= accuracy(log_pred_MVG,LTE)
 # # inacc_MVG = 1-acc_MVG
 # # print("Error rate MVG LDA con ml = "+str(ml)+ " : "+ str(inacc_MVG*100))
 
 # log_pred_MVG = MVG_approach(DPW, LTR, 0.5, DTEPW, LTE)
-# acc_MVG,_= evaluation(log_pred_MVG,LTE)
+# acc_MVG,_= accuracy(log_pred_MVG,LTE)
 # inacc_MVG = 1-acc_MVG
 # print("Error rate MVG LDA + PCA con m = "+ str(mp)+ " : "+str(inacc_MVG*100))
 
@@ -75,17 +97,17 @@ if __name__=='__main__':
 
 # ##NB
 # log_pred_NB = NB_approach(DTR, LTR, 0.5, DTE, LTE)
-# acc_NB,_= evaluation(log_pred_NB,LTE)
+# acc_NB,_= accuracy(log_pred_NB,LTE)
 # inacc_NB = 1-acc_NB
 # print("Error rate MVG_NB no PCA : "+str(inacc_NB*100))
 
 # log_pred_NB = NB_approach(DP, LTR, 0.5, DTEP, LTE)
-# acc_NB,_= evaluation(log_pred_NB,LTE)
+# acc_NB,_= accuracy(log_pred_NB,LTE)
 # inacc_NB = 1-acc_NB
 # print("Error rate MVG_NB PCA con m = "+ str(mp)+ " : "+str(inacc_NB*100))
 
 # log_pred_NB = NB_approach(DPW, LTR, 0.5, DTEPW, LTE)
-# acc_NB,_= evaluation(log_pred_NB,LTE)
+# acc_NB,_= accuracy(log_pred_NB,LTE)
 # inacc_NB = 1-acc_NB
 # print("Error rate MVG_NB LDA+PCA con m = "+ str(mp)+ " : "+str(inacc_NB*100))
 
@@ -93,39 +115,46 @@ if __name__=='__main__':
 
 # #TCG
 # log_pred_TCG = TCG_approach(DTR, LTR, 0.5, DTE, LTE)
-# acc_TCG,_= evaluation(log_pred_TCG,LTE)
+# acc_TCG,_= accuracy(log_pred_TCG,LTE)
 # inacc_TCG = 1-acc_TCG
 # print("Error rate MVG_TCG no PCA : "+str(inacc_TCG*100))
 
 # log_pred_TCG = TCG_approach(DP, LTR, 0.5, DTEP, LTE)
-# acc_TCG,_= evaluation(log_pred_TCG,LTE)
+# acc_TCG,_= accuracy(log_pred_TCG,LTE)
 # inacc_TCG = 1-acc_TCG
 # print("Error rate MVG_TCG PCA con m = "+ str(mp)+ " : "+str(inacc_TCG*100))
 
 
 # log_pred_TCG = TCG_approach(DPW, LTR, 0.5, DTEPW, LTE)
-# acc_TCG,_= evaluation(log_pred_TCG,LTE)
+# acc_TCG,_= accuracy(log_pred_TCG,LTE)
 # inacc_TCG = 1-acc_TCG
 # print("Error rate MVG_TCG PCA + LDA con m = "+ str(mp)+ " : "+str(inacc_TCG*100))
 
 # print("------------------------")
 
 
-## Cost evaluation
-prior,Cfp,Cfn = (0.5,10,1)
-means,S_matrices,_ = MVG_model(DTR,LTR) #3 means and 3 S_matrices -> 1 for each class (3 classes)
-ll0,ll1 = loglikelihoods(DTE,means,S_matrices)
-llr = ll1-ll0
+#####################        COST EVALUATION AND CALIBRATION         #######################
+# prior,Cfp,Cfn = (0.5,10,1)
+# means,S_matrices,_ = MVG_model(DTR,LTR) #3 means and 3 S_matrices -> 1 for each class (3 classes)
+# ll0,ll1 = loglikelihoods(DTE,means,S_matrices)
+# llr = ll1-ll0
 
-#evaluation with DCF
-post_prob = binary_posterior_prob(llr,prior,Cfn,Cfp)
-#DCF_norm = DCF_norm_impl(llr, LTE, prior, Cfp, Cfn)
-#DCF_min,t_min,thresholds = DCF_min_impl(llr, LTE, prior, Cfp, Cfn)
-thresholds = np.sort(post_prob)
-ROC_plot(thresholds, post_prob, LTE)
-Bayes_DCF,Bayes_DCF_min = Bayes_plot(llr,label)
-print("DCF_norm: "+str(DCF_norm))
-print("DCF_min: "+str(DCF_min)+" con t: "+str(t_min))
+# #COSTS and CALIBRATION with DCF
+# post_prob = binary_posterior_prob(llr,prior,Cfn,Cfp)
+# DCF_norm = DCF_norm_impl(llr, LTE, prior, Cfp, Cfn)
+# print(DCF_norm)
+# DCF_min,t_min,thresholds = DCF_min_impl(llr, LTE, prior, Cfp, Cfn)
+# print("DCF_norm: "+str(DCF_norm))
+# print("DCF_min: "+str(DCF_min)+" con t: "+str(t_min))
+
+# #ROC and Bayes error
+# thresholds = np.sort(post_prob)
+# ROC_plot(thresholds, post_prob, LTE)
+# Bayes_DCF,Bayes_DCF_min = Bayes_plot(llr,LTE)
+
+
+
+
 
 
 

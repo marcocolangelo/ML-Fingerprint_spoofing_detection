@@ -95,7 +95,7 @@ def log_post_prob(log_SJoint):
     return log_pred
     
 
-def evaluation(pred,LTE) : 
+def accuracy(pred,LTE) : 
     
     
     mask = (pred==LTE)
@@ -138,13 +138,23 @@ def MVG_approach(D,L,Pc,DTE,LTE):
     log_pred = log_post_prob(log_sm_joint)
     
     #simple function to evaluate the accuracy of our model
-    # acc,_ = evaluation(pred,LTE)  
-    # acc_2,_=evaluation(log_pred,LTE)
+    # acc,_ = accuracy(pred,LTE)  
+    # acc_2,_=accuracy(log_pred,LTE)
     # inacc = 1-acc
     
-    return log_pred,
+    return log_pred
 
-
+def MVG_llr(D,L,DTE):
+    #remember iris dataset is characterized by elements with 4 characteristics split up into 3 classes
+    
+    #using the functions built in lab04 we can create the several muc and Sc for the MVG model
+    means,S_matrices,_ = MVG_model(D,L) #3 means and 3 S_matrices -> 1 for each class (3 classes)
+    
+    #we create a NxNc matrix with the log-likelihoods elements
+    #each row represents a class and each column represents a sample
+    #so S[i,j] represents the log_likelihood value for that j-th sample bound to the i-th class
+    ll0,ll1 = loglikelihoods(DTE,means,S_matrices)
+    return ll1-ll0
 
 def NB_approach(D,L,Pc,DTE,LTE):
     #remember iris dataset is characterized by elements with 4 characteristics split up into 3 classes
@@ -175,11 +185,26 @@ def NB_approach(D,L,Pc,DTE,LTE):
     log_pred = log_post_prob(log_sm_joint)
     
     #simple function to evaluate the accuracy of our model
-    acc,_ = evaluation(pred,LTE)  
-    acc_2,_=evaluation(log_pred,LTE)
+    acc,_ = accuracy(pred,LTE)  
+    acc_2,_=accuracy(log_pred,LTE)
     inacc = 1-acc
     
     return log_pred
+
+def NB_llr(D,L,DTE):
+    #remember iris dataset is characterized by elements with 4 characteristics split up into 3 classes
+    
+    #using the functions built in lab04 we can create the several muc and Sc for the MVG model
+    means,S_matrices,_ = MVG_model(D,L) #3 means and 3 S_matrices -> 1 for each class (3 classes)
+    
+    for i in range(np.array(S_matrices).shape[0]):
+        S_matrices[i] = S_matrices[i]*np.eye(S_matrices[i].shape[0],S_matrices[i].shape[1])
+    
+    #we create a NxNc matrix with the log-likelihoods elements
+    #each row represents a class and each column represents a sample
+    #so S[i,j] represents the log_likelihood value for that j-th sample bound to the i-th class
+    ll0,ll1 = loglikelihoods(DTE,means,S_matrices)
+    return ll1-ll0
 
 def TCG_approach(D,L,Pc,DTE,LTE):
     
@@ -212,11 +237,20 @@ def TCG_approach(D,L,Pc,DTE,LTE):
     #SPost_sol=np.load('Posterior_TiedMVG.npy')
     
     #simple function to evaluate the accuracy of our model
-    acc,_ = evaluation(pred,LTE)  
-    acc_2,_=evaluation(log_pred,LTE)
+    acc,_ = accuracy(pred,LTE)  
+    acc_2,_=accuracy(log_pred,LTE)
     inacc = 1-acc
 
     return log_pred
+
+def TCG_llr(D,L,DTE):
+    means,S_matrix = TCG_model(D,L) #3 means and 1 S_matrix -> tied matrix because of strong dipendence among the classes
+    
+    #to recycle yet exiting code (loglikelihoods function), I generated a S_matrices variable cloning three times the S_matrix 
+    S_matrices = [S_matrix,S_matrix,S_matrix]
+    
+    ll0,ll1 = loglikelihoods(DTE,means,S_matrices)
+    return ll1-ll0
 
 def TCNBG_approach(D,L,Pc,DTE,LTE):
     means,S_matrix = TCG_model(D,L) #3 means and 1 S_matrix -> tied matrix because of strong dipendence among the classes
@@ -248,8 +282,8 @@ def TCNBG_approach(D,L,Pc,DTE,LTE):
     #SPost_sol=np.load('Posterior_TiedMVG.npy')
     
     #simple function to evaluate the accuracy of our model
-    acc,_ = evaluation(pred,LTE)  
-    acc_2,_=evaluation(log_pred,LTE)
+    acc,_ = accuracy(pred,LTE)  
+    acc_2,_=accuracy(log_pred,LTE)
     inacc = 1-acc
 
     return log_pred
@@ -299,9 +333,9 @@ def LOO(D,L):
 #     pred_Tied_cov_Gauss = TCG_approach(DTR,LTR,DTE)
     
 #     #accuracy evaluation system
-#     print(evaluation(pred_MVG,LTE)[0]*100)
-#     print(evaluation(pred_Naive_Bayes,LTE)[0]*100)
-#     print(evaluation(pred_Tied_cov_Gauss,LTE)[0]*100)
+#     print(accuracy(pred_MVG,LTE)[0]*100)
+#     print(accuracy(pred_Naive_Bayes,LTE)[0]*100)
+#     print(accuracy(pred_Tied_cov_Gauss,LTE)[0]*100)
     
     
     
@@ -310,13 +344,13 @@ def LOO(D,L):
 #     #NOT SURE THIS IS THE RIGHT SOLUTION EXPECIALLY ABOUT WHAT KIND OF DATASET WE NEED TO USE!!!!!
 #     MVG_pred,NB_pred,TCG_pred,TCNBG_pred = LOO(DTR,LTR)
     
-#     MVG_acc,MVG_err = evaluation(MVG_pred, L)
+#     MVG_acc,MVG_err = accuracy(MVG_pred, L)
     
-#     NB_acc,NB_err = evaluation(NB_pred,L)
+#     NB_acc,NB_err = accuracy(NB_pred,L)
     
-#     TCG_acc,TCG_err = evaluation(TCG_pred, L)
+#     TCG_acc,TCG_err = accuracy(TCG_pred, L)
     
-#     TCNBG_acc,TCNBG_err = evaluation(TCNBG_pred, L)
+#     TCNBG_acc,TCNBG_err = accuracy(TCNBG_pred, L)
     
 #     print("LLO_MVG_err_ratio: ",(1-MVG_acc)*100)
 #     print("LLO_NB_err_ratio: ",(1-NB_acc)*100)

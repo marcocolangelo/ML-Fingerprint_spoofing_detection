@@ -3,8 +3,9 @@ import matplotlib.pyplot as plt
 
 #this function compute the confusion_matrix confronting predictions on the classes and actual labels
 def confusion_matrix(pred,LTE):
-    nclasses = np.max(LTE)+1
+    nclasses = int(np.max(LTE))+1
     matrix = np.zeros((nclasses,nclasses))
+    
     
     for i in range(len(pred)):
         matrix[pred[i],LTE[i]] += 1
@@ -107,7 +108,6 @@ def DCF_norm_impl(llr,label,prior,Cfp,Cfn):
         # infpar_label =np.load("Data\commedia_labels_infpar_eps1.npy")
         # prior,Cfp,Cfn = (0.5,1,1)
         post_prob = binary_posterior_prob(llr,prior,Cfn,Cfp)
-        print(post_prob)
         pred = [1 if x > 0 else 0 for x in post_prob]
         cm = confusion_matrix(pred, label)
         #observe that when prior increase = class1 predicted more frequently by the classifier
@@ -118,8 +118,8 @@ def DCF_norm_impl(llr,label,prior,Cfp,Cfn):
         DCFu = binary_DCFu(prior,Cfn,Cfp,cm)
         #let's compute DCF now, normalizing DCFu with a dummy system DCFu
         dummy_DCFu = min(prior*Cfn,(1-prior)*Cfp)
-        print("dummy DCF: "+str(dummy_DCFu))
-        print("DCFu : "+str(DCFu));
+        #print("dummy DCF: "+str(dummy_DCFu))
+        #print("DCFu : "+str(DCFu));
         DCF_norm = DCFu/dummy_DCFu
         
         return DCF_norm
@@ -129,7 +129,7 @@ def DCF_min_impl(llr,label,prior,Cfp,Cfn):
     thresholds = np.sort(post_prob)
     DCF_tresh = []
     dummy_DCFu = min(prior*Cfn,(1-prior)*Cfp)
-    print("shape di post prob in DCF_min: "+str(post_prob.shape))
+    #print("shape di post prob in DCF_min: "+str(post_prob.shape))
     
     #iteration over all the possible threshold values
     for t in thresholds:
