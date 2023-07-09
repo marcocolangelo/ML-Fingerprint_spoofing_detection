@@ -7,7 +7,9 @@ from Gaussian_model.MVG_density import *
 from Gaussian_model.class_MVG import *
 from evaluation_functions.evaluation import *
 from validation.k_fold import *
-
+from logistic_regression.logreg import logRegClass,quadLogRegClass
+import numpy as np
+import matplotlib.pyplot as plt
 
 if __name__=='__main__':
     (DTR,LTR), (DTE,LTE)=loadTrainTest('dataset\Train.txt','dataset\Test.txt')
@@ -49,30 +51,172 @@ if __name__=='__main__':
     #plot_pearson_correlation(DTR, LTR,1)
     
 ## PCA and variance plot
-    PCA_plot(DTR)
+    #PCA_plot(DTR)
     
-############################       K-FOLD                 ############################
-prior,Cfp,Cfn = (0.5,10,1)
-options={"K":5,
-          "pca":6,
-          "pi":0.5,
-          "costs":(1,10)}
+############################                          K-FOLD                  #########################################
+    prior,Cfp,Cfn = (0.5,10,1)
+# options={"K":5,
+#           "pca":6,
+#           "pi":0.5,
+#           "costs":(1,10)}
+                                ###### MVG  #####
+# K = 5
+# MVG_obj = GaussClass("MVG")
+# NB_obj = GaussClass("NB")
+# TCG_obj = GaussClass("TCG")
+# TCGNB_obj = GaussClass("TCGNB") 
 
-MVG_obj = GaussClass("MVG")
-NB_obj = GaussClass("NB")
-TCG_obj = GaussClass("TCG")
+# mvg_pca6 = 0
+# mvg_pca7 = 0
+# mvg_pca8 = 0
+# mvg_pca9 = 0
+# mvg_pcaNone = 0
 
-min_DCF, scores, labels = kfold(DTR, LTR, MVG_obj,options)
-print("DCFmin per "+"MVG: "+str(min_DCF))
-min_DCF, scores, labels = kfold(DTR, LTR, NB_obj,options)
-print("DCFmin per "+"NB: "+str(min_DCF))
-min_DCF, scores, labels = kfold(DTR, LTR, TCG_obj,options)
-print("DCFmin per "+"TCG: "+str(min_DCF))
+# for model in [MVG_obj,NB_obj,TCG_obj,TCGNB_obj]:
+#     for pca in [6,7,8,9,None]:
+#         options={"K":5,
+#                   "pca":pca,
+#                   "pi":0.5,
+#                   "costs":(1,10)}
+        
+#         min_DCF, scores, labels = kfold(DTR, LTR, model,options)
+#         if pca == 6:
+#             mvg_pca6=min_DCF
+#         if pca == 7:
+#             mvg_pca7=min_DCF
+#         if pca == 8:
+#             mvg_pca8=min_DCF
+#         if pca == 9:
+#             mvg_pca9=min_DCF
+#         if pca == None:
+#             mvg_pcaNone=min_DCF
+            
+#         print(f"{model.name()} min_DCF con K = {K} , pca = {pca}: {min_DCF} ")
+        
+#     mvg_pca = np.array([mvg_pca6,
+#     mvg_pca7 ,
+#     mvg_pca8 ,
+#     mvg_pca9 ,
+#     mvg_pcaNone])
+    
+#     plt.xlabel("PCA dimensions")
+#     plt.ylabel("DCF_min")
+#     #plt.legend()
+#     plt.title(model.name())
+#     path= "plots/gaussian/"+str(model.name())
+#     plt.plot(np.linspace(6,10,5),mvg_pca)
+#     plt.savefig(path)
+#     plt.show()
+    
+        
+
+                            ####### LOG REG   #######
+# K=  5
+# piT = 0.1
+# lamb  =np.logspace(-7, 2, num=9)
+# for piT in [0.1,0.5,0.9]:
+#     lr_pca6 = []
+#     lr_pca7 = []
+#     lr_pca8 = []
+#     lr_pca9 = []
+#     lr_pcaNone = []
+#     for l in np.logspace(-6, 2, num=9):
+#         #we saw that piT=0.1 is the best value
+#             for pca in [6,7,8,9,None]:
+#                 options={"K":5,
+#                           "pca":pca,
+#                           "pi":0.5,
+#                           "costs":(1,10)}
+#                 logObj = logRegClass(l,piT)
+#                 min_DCF, scores, labels = kfold(DTR, LTR,logObj,options)
+#                 print(f"Log Reg min_DCF con K = {K} , pca = {pca}, l = {l} , piT = {piT}: {min_DCF} ")
+                
+#                 if pca == 6:
+#                     lr_pca6.append(min_DCF)
+#                 if pca == 7:
+#                     lr_pca7.append(min_DCF)
+#                 if pca == 8:
+#                     lr_pca8.append(min_DCF)
+#                 if pca == 9:
+#                     lr_pca9.append(min_DCF)
+#                 if pca == None:
+#                     lr_pcaNone.append(min_DCF)
+    
+#     plt.semilogx(lamb,lr_pca6, label = "PCA 6")
+#     plt.semilogx(lamb,lr_pca7, label = "PCA 7")
+#     plt.semilogx(lamb,lr_pca8, label = "PCA 8")
+#     plt.semilogx(lamb,lr_pca9, label = "PCA 9")
+#     plt.semilogx(lamb,lr_pcaNone, label = "No PCA")
+    
+#     plt.xlabel("Lambda")
+#     plt.ylabel("DCF_min")
+#     plt.legend()
+#     if piT == 0.1:
+#         path = "plots/logReg/DCF_su_lambda_piT_min"
+#     if piT == 0.5:
+#         path = "plots/logReg/DCF_su_lambda_piT_medium"
+#     if piT == 0.9:
+#         path = "plots/logReg/DCF_su_lambda_piT_max"
+#     plt.title(piT)
+#     plt.savefig(path)
+#     plt.show()
+
+                                        ####### QUAD LOG REG   #######
+K=  5
+piT = 0.1
+lamb  =np.logspace(-7, 2, num=9)
+for piT in [0.1,0.5,0.9]:
+    lr_pca6 = []
+    lr_pca7 = []
+    lr_pca8 = []
+    lr_pca9 = []
+    lr_pcaNone = []
+    for l in np.logspace(-6, 2, num=9):
+        #we saw that piT=0.1 is the best value
+            for pca in [6,7,8,9,None]:
+                options={"K":5,
+                          "pca":pca,
+                          "pi":0.5,
+                          "costs":(1,10),
+                          "lr_quad":True}
+                quadLogObj = quadLogRegClass(l, piT)
+                min_DCF, scores, labels = kfold(DTR, LTR,quadLogObj,options)
+                print(f"Log Reg min_DCF con K = {K} , pca = {pca}, l = {l} , piT = {piT}: {min_DCF} ")
+                
+                if pca == 6:
+                    lr_pca6.append(min_DCF)
+                if pca == 7:
+                    lr_pca7.append(min_DCF)
+                if pca == 8:
+                    lr_pca8.append(min_DCF)
+                if pca == 9:
+                    lr_pca9.append(min_DCF)
+                if pca == None:
+                    lr_pcaNone.append(min_DCF)
+    
+    plt.semilogx(lamb,lr_pca6, label = "PCA 6")
+    plt.semilogx(lamb,lr_pca7, label = "PCA 7")
+    plt.semilogx(lamb,lr_pca8, label = "PCA 8")
+    plt.semilogx(lamb,lr_pca9, label = "PCA 9")
+    plt.semilogx(lamb,lr_pcaNone, label = "No PCA")
+        
+    plt.xlabel("Lambda")
+    plt.ylabel("DCF_min")
+    plt.legend()
+    if piT == 0.1:
+        path = "plots/quadLogReg/DCF_su_lambda_piT_min"
+    if piT == 0.5:
+        path = "plots/quadLogReg/DCF_su_lambda_piT_medium"
+    if piT == 0.9:
+        path = "plots/logReg/DCF_su_lambda_piT_max"
+    plt.title(piT)
+    plt.savefig(path)
+    plt.show()
 
 
-############################       MODEL BUILDING         ############################ 
+############################                     MODEL BUILDING         ############################################## 
 
-# ##MVG
+                                    ############      MVG      ##################
 # log_pred_MVG = MVG_approach(DTR, LTR, 0.5, DTE, LTE)
 # acc_MVG,_= accuracy(log_pred_MVG,LTE)
 # inacc_MVG = 1-acc_MVG
@@ -131,6 +275,16 @@ print("DCFmin per "+"TCG: "+str(min_DCF))
 # print("Error rate MVG_TCG PCA + LDA con m = "+ str(mp)+ " : "+str(inacc_TCG*100))
 
 # print("------------------------")
+
+                    
+                ####################                    LOG REG                     ########################
+# logObj = logRegClass(DTR, LTR, 0.1)
+# logObj.train();
+# lp_pred,lg_llr = logObj.test(DTE)
+# acc,_ = accuracy(lp_pred,LTE)
+# DCF_min,_,_ = DCF_min_impl(lg_llr, LTE, prior, Cfp, Cfn)
+# print(100-acc*100)
+# print("LR DCF_min: "+str(DCF_min))
 
 
 #####################        COST EVALUATION AND CALIBRATION         #######################

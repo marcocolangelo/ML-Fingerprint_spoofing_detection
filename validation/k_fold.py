@@ -1,5 +1,5 @@
 import numpy
-from evaluation_functions.evaluation import DCF_min_impl
+from evaluation_functions.evaluation import *
 from Gaussian_model.new_MVG_model import *
 from features_analysis.PCA import *
 
@@ -59,6 +59,7 @@ def kfold(D, L,classifier, options):
         pca = options["pca"]
         pi = options["pi"]
         (cfn, cfp) = options["costs"]
+        lr_quad = options["lr_quad"]
         
         samplesNumber = D.shape[1]
         N = int(samplesNumber / K)
@@ -92,6 +93,7 @@ def kfold(D, L,classifier, options):
                 DTE = numpy.dot(P.T, DTE)
                 
             classifier.train(DTR, LTR)
+            
             scores_i = classifier.compute_scores(DTE)
             
             

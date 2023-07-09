@@ -11,17 +11,27 @@ class GaussClass:
         self.ll1 = 0
         self.mode = mode
         
+    def name(self):
+        return self.mode
+        
     def train(self,DTR,LTR):
         if self.mode == "MVG":
             means,S_matrices,_ = m.MVG_model(DTR,LTR)
-        if self.mode == "NB":
+        elif self.mode == "NB":
             means,S_matrices,_ = m.MVG_model(DTR,LTR) #3 means and 3 S_matrices -> 1 for each class (3 classes)
             for i in range(np.array(S_matrices).shape[0]):
                 S_matrices[i] = S_matrices[i]*np.eye(S_matrices[i].shape[0],S_matrices[i].shape[1])
-        if self.mode == "TCG":
+        elif self.mode == "TCG":
             means,S_matrix = m.TCG_model(DTR,LTR) #3 means and 1 S_matrix -> tied matrix because of strong dipendence among the classes
             #to recycle yet exiting code (loglikelihoods function), I generated a S_matrices variable cloning three times the S_matrix 
             S_matrices = [S_matrix,S_matrix,S_matrix]
+        elif self.mode == "TCGNB":
+            means,S_matrix = m.TCG_model(DTR,LTR) #3 means and 1 S_matrix -> tied matrix because of strong dipendence among the classes
+            S_matrix = S_matrix * np.eye(S_matrix.shape[0],S_matrix.shape[1])
+            #to recycle yet exiting code (loglikelihoods function), I generated a S_matrices variable cloning three times the S_matrix 
+            S_matrices = [S_matrix,S_matrix,S_matrix]
+        else:
+            print(f"Model variant {self.mode} not supported!")
            
         self.means = means
         self.S_matrices = S_matrices
