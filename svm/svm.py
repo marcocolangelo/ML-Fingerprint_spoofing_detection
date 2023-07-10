@@ -12,9 +12,10 @@ class SVMClass:
         self.K = K
         self.C = C
         self.piT = piT
-        self.Z = 0
-        self.w_hat_star = 0
-        self.f = 0
+        self.Z = []
+        self.D_ = []
+        self.w_hat_star = []
+        self.f = []
     
     def compute_lagrangian_wrapper(self,H):
         def compute_lagrangian(alpha):
@@ -36,8 +37,11 @@ class SVMClass:
     def compute_primal_objective(self,w_star,C,Z,D_):
         w_star = mcol(w_star)
         Z = mRow(Z)
+        # print("w size: "+str(w_star.shape))
+        # print("D size: "+str(D_.shape))
+        # print("Z size: "+str(Z.shape))
         fun1= 0.5 * (w_star*w_star).sum()   
-        fun2 = Z* numpy.dot(w_star.T, D_)
+        fun2 = Z * numpy.dot(w_star.T, D_)
         fun3 = 1- fun2
         zeros = numpy.zeros(fun3.shape)
         sommatoria = numpy.maximum(zeros, fun3)
@@ -47,6 +51,7 @@ class SVMClass:
         return ris
     
     def train(self,DTR,LTR):
+        # print("dentro train")
         nf = DTR[:,LTR==0].shape[1]
         nt = DTR[:,LTR==1].shape[1]
         emp_prior_f = nf/ DTR.shape[1]
@@ -56,6 +61,7 @@ class SVMClass:
         
         K_row = numpy.ones((1, DTR.shape[1])) * self.K
         D_ = numpy.vstack((DTR, K_row))
+        self.D_ = D_
         #print(D_)
         self.Z,H_=self.compute_H(D_,LTR)
         compute_lag=self.compute_lagrangian_wrapper(H_)
@@ -74,22 +80,23 @@ class SVMClass:
         self.w_hat_star = w_hat_star
         
     def compute_scores(self,DTE):
-        K_row = numpy.ones((1, DTE.shape[1])) * self.K
-        D_ = numpy.vstack((DTE, K_row))
-        score = numpy.dot(self.w_hat_star, D_)
+        # print("dentro comp_score")
+        K_row2 = numpy.ones((1, DTE.shape[1])) * self.K
+        D2_ = numpy.vstack((DTE, K_row2))
+        score = numpy.dot(self.w_hat_star, D2_)
         
         predicted_labels = numpy.where(score > 0, 1, 0)
-        error = (predicted_labels != DTE).mean()
+        #error = (predicted_labels != DTE).mean()
         #accuracy,error=compute_accuracy_error(predicted_labels,mRow(LTE))
-        primal_obj=self.compute_primal_objective(self.w_hat_star,self.C,self.Z,D_)
+        primal_obj=self.compute_primal_objective(self.w_hat_star,self.C,self.Z,self.D_)
         dual_gap=primal_obj+self.f
-        print("K:",self.K)
-        print("C:",self.C)
-        print("primal loss: ",primal_obj)
-        print("dual loss: ", -self.f)
-        print("dual gap: ",dual_gap)
-        print(f'Error rate: {error * 100:.1f}%')
-
+        # print("K:",self.K)
+        # print("C:",self.C)
+        # print("primal loss: ",primal_obj)
+        # print("dual loss: ", -self.f)
+        # print("dual gap: ",dual_gap)
+        # print(f'Error rate: {error * 100:.1f}%')
+        return score
 
 # if __name__=='__main__':
      
@@ -105,19 +112,19 @@ class SVMClass:
       #       bound_list=[(0,C)]*LTR.size
       #       #factr=1 requires more iteration but returns more accurate results
       #       (alfa,f,d)=scipy.optimize.fmin_l_bfgs_b(compute_lag,x0=numpy.zeros(LTR.size),approx_grad=False,factr=1.0,bounds=bound_list)
-      #       w_hat_star = (mcol(alfa)* Z * D_.T).sum(axis=0)
-      #       w_star=w_hat_star[:-1]
-      #       b_star=w_hat_star[-1]
+             # w_hat_star = (mcol(alfa)* Z * D_.T).sum(axis=0)
+             # w_star=w_hat_star[:-1]
+             # b_star=w_hat_star[-1]
             
-      #       K_row2 = numpy.ones((1, DTE.shape[1])) * K
-      #       D_2 = numpy.vstack((DTE, K_row2))
-      #       score = w_hat_star @ D_2
+             # K_row2 = numpy.ones((1, DTE.shape[1])) * K
+             # D_2 = numpy.vstack((DTE, K_row2))
+             # score = w_hat_star @ D_2
             
-      #       predicted_labels = numpy.where(score > 0, 1, 0)
-      #       error = (predicted_labels != LTE).mean()
-      #       #accuracy,error=compute_accuracy_error(predicted_labels,mRow(LTE))
-      #       primal_obj=compute_primal_objective(w_hat_star,C,Z,D_)
-      #       dual_gap=primal_obj+f
+             # predicted_labels = numpy.where(score > 0, 1, 0)
+             # error = (predicted_labels != LTE).mean()
+             # #accuracy,error=compute_accuracy_error(predicted_labels,mRow(LTE))
+             # primal_obj=compute_primal_objective(w_hat_star,C,Z,D_)
+             # dual_gap=primal_obj+f
       #       print("K:",K)
       #       print("C:",C)
       #       print("primal loss: ",primal_obj)

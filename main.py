@@ -223,17 +223,20 @@ for piT in [0.1,0.33,0.5,0.9]:
     svm_pca8 = []
     svm_pca9 = []
     svm_pcaNone = []
+    C_values = np.logspace(-5, 2, num=8)
     for C in np.logspace(-5, 2, num=8):
         for K_svm in [1]:
         #we saw that piT=0.1 is the best value
-            for pca in [6,7,8,9,None]:
+            for pca in [6,8]:
                 options={"K":5,
-                          "pca":None,
+                          "pca":pca,
                           "pi":0.5,
                           "costs":(1,10),
                           "znorm":False}
                 SVMObj = SVMClass(K_svm, C, piT)
                 min_DCF, scores, labels = kfold(DTR, LTR,SVMObj,options)
+                if min_DCF > 1: 
+                    min_DCF = 1
                 print(f"SVM min_DCF con K = {K} ,K_svm = {K_svm},  C = {C} , piT = {piT}, pca = {pca}: {min_DCF} ")
                 
                 if pca == 6:
@@ -247,21 +250,24 @@ for piT in [0.1,0.33,0.5,0.9]:
                 if pca == None:
                     svm_pcaNone.append(min_DCF)
     
-    plt.semilogx(C,svm_pca6, label = "PCA 6")
-    plt.semilogx(C,svm_pca7, label = "PCA 7")
-    plt.semilogx(C,svm_pca8, label = "PCA 8")
-    plt.semilogx(C,svm_pca9, label = "PCA 9")
-    plt.semilogx(C,svm_pcaNone, label = "No PCA")
+    plt.semilogx(C_values,svm_pca6, label = "PCA 6")
+    plt.semilogx(C_values,svm_pca7, label = "PCA 7")
+    plt.semilogx(C_values,svm_pca8, label = "PCA 8")
+    plt.semilogx(C_values,svm_pca9, label = "PCA 9")
+    plt.semilogx(C_values,svm_pcaNone, label = "No PCA")
         
     plt.xlabel("C")
     plt.ylabel("DCF_min")
     plt.legend()
     if piT == 0.1:
         path = "plots/svm/DCF_su_C_piT_min"
+    if piT == 0.33:
+        path = "plots/svm/DCF_su_C_piT_033"
     if piT == 0.5:
         path = "plots/svm/DCF_su_C_piT_medium"
     if piT == 0.9:
         path = "plots/svm/DCF_su_C_piT_max"
+    
     plt.title(piT)
     plt.savefig(path)
     plt.show()

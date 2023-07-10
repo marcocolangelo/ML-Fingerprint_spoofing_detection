@@ -100,8 +100,8 @@ def kfold(D, L,classifier, options):
             classifier.train(DTR, LTR)
             
             scores_i = classifier.compute_scores(DTE)
-            
-            
+            #print("SMV score: ")
+            #print(scores_i)
             scores = numpy.append(scores, scores_i)
             labels = numpy.append(labels, LTE)
             
