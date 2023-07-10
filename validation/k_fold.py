@@ -2,6 +2,7 @@ import numpy
 from evaluation_functions.evaluation import *
 from Gaussian_model.new_MVG_model import *
 from features_analysis.PCA import *
+from features_analysis.z_norm import znorm_impl,normalize_zscore
 
 # def k_fold_cross_validation(X, y, K, model,prior,Cfn,Cfp):
 #     """
@@ -59,7 +60,7 @@ def kfold(D, L,classifier, options):
         pca = options["pca"]
         pi = options["pi"]
         (cfn, cfp) = options["costs"]
-        lr_quad = options["lr_quad"]
+        znorm = options["znorm"]
         
         samplesNumber = D.shape[1]
         N = int(samplesNumber / K)
@@ -91,6 +92,10 @@ def kfold(D, L,classifier, options):
             if pca is not None: #PCA needed
                 DTR, P = PCA_impl(DTR, pca)
                 DTE = numpy.dot(P.T, DTE)
+                
+            if znorm == True:
+                DTR,mu,sigma= normalize_zscore(DTR)
+                DTE,_,_ = normalize_zscore(DTE,mu,sigma)
                 
             classifier.train(DTR, LTR)
             

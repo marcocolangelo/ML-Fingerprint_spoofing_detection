@@ -74,8 +74,6 @@ class quadLogRegClass:
         #we extrapolate the w and b parameters to insert in the J loss-function
         
         
-        ##### end of gradient function ####
-        
         w,b = v[0:-1],v[-1]
         w = vcol(w)
         n = self.fi_x.shape[1]
@@ -102,7 +100,10 @@ class quadLogRegClass:
         self.LTR = LTR
         self.nt = DTR[:, LTR == 1].shape[1]
         self.nf = DTR.shape[1]-self.nt
-       
+        
+        print("nt: "+str(self.nt))
+        print("nf: "+str(self.nf))
+        
         def vecxxT(x):
             x = x[:, None]
             xxT = x.dot(x.T).reshape(x.size ** 2, order='F')
@@ -123,9 +124,7 @@ class quadLogRegClass:
         self.grad_funct = self.gradient_test(self.fi_x, self.LTR, self.l, self.piT,self.nt,self.nf)
         
         #print("sono dentro")
-        
-        # logRegObj = logRegClass(self.DTR, self.LTR, self.l) #I created an object logReg with logreg_obj inside
-        
+                
         #optimize.fmin_l_bfgs_b looks for secod order info to search direction pt and then find an acceptable step size at for pt
         #I set approx_grad=True so the function will generate an approximated gradient for each iteration
         params,f_min,_ = sc.optimize.fmin_l_bfgs_b(self.quad_logreg_obj, x0)

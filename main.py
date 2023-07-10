@@ -8,6 +8,7 @@ from Gaussian_model.class_MVG import *
 from evaluation_functions.evaluation import *
 from validation.k_fold import *
 from logistic_regression.logreg import logRegClass,quadLogRegClass
+from svm.svm import SVMClass
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -162,56 +163,109 @@ if __name__=='__main__':
 #     plt.show()
 
                                         ####### QUAD LOG REG   #######
+# K=  5
+# piT = 0.1
+# lamb  =np.logspace(-7, 2, num=9)
+# for piT in [0.1,0.33,0.5,0.9]:
+#     lr_pca6 = []
+#     lr_pca7 = []
+#     lr_pca8 = []
+#     lr_pca9 = []
+#     lr_pcaNone = []
+#     for l in np.logspace(-6, 2, num=9):
+#         #we saw that piT=0.1 is the best value
+#             for pca in [6,7,8,9,None]:
+#                 options={"K":5,
+#                           "pca":pca,
+#                           "pi":0.5,
+#                           "costs":(1,10),
+#                           "znorm":False}
+#                 quadLogObj = quadLogRegClass(l, piT)
+#                 min_DCF, scores, labels = kfold(DTR, LTR,quadLogObj,options)
+#                 print(f"Log Reg min_DCF con K = {K} , pca = {pca}, l = {l} , piT = {piT}: {min_DCF} ")
+                
+#                 if pca == 6:
+#                     lr_pca6.append(min_DCF)
+#                 if pca == 7:
+#                     lr_pca7.append(min_DCF)
+#                 if pca == 8:
+#                     lr_pca8.append(min_DCF)
+#                 if pca == 9:
+#                     lr_pca9.append(min_DCF)
+#                 if pca == None:
+#                     lr_pcaNone.append(min_DCF)
+    
+#     plt.semilogx(lamb,lr_pca6, label = "PCA 6")
+#     plt.semilogx(lamb,lr_pca7, label = "PCA 7")
+#     plt.semilogx(lamb,lr_pca8, label = "PCA 8")
+#     plt.semilogx(lamb,lr_pca9, label = "PCA 9")
+#     plt.semilogx(lamb,lr_pcaNone, label = "No PCA")
+        
+#     plt.xlabel("Lambda")
+#     plt.ylabel("DCF_min")
+#     plt.legend()
+#     if piT == 0.1:
+#         path = "plots/quadLogReg/znorm/DCF_su_lambda_piT_min_znorm"
+#     if piT == 0.5:
+#         path = "plots/quadLogReg/znorm/DCF_su_lambda_piT_medium_znorm"
+#     if piT == 0.9:
+#         path = "plots/quadLogReg/znorm/DCF_su_lambda_piT_max_znorm"
+#     plt.title(piT)
+#     plt.savefig(path)
+#     plt.show()
+        
+                                            #######   SVM   #######
 K=  5
 piT = 0.1
-lamb  =np.logspace(-7, 2, num=9)
-for piT in [0.1,0.5,0.9]:
-    lr_pca6 = []
-    lr_pca7 = []
-    lr_pca8 = []
-    lr_pca9 = []
-    lr_pcaNone = []
-    for l in np.logspace(-6, 2, num=9):
+for piT in [0.1,0.33,0.5,0.9]:
+    svm_pca6 = []
+    svm_pca7 = []
+    svm_pca8 = []
+    svm_pca9 = []
+    svm_pcaNone = []
+    for C in np.logspace(-5, 2, num=8):
+        for K_svm in [1]:
         #we saw that piT=0.1 is the best value
             for pca in [6,7,8,9,None]:
                 options={"K":5,
-                          "pca":pca,
+                          "pca":None,
                           "pi":0.5,
                           "costs":(1,10),
-                          "lr_quad":True}
-                quadLogObj = quadLogRegClass(l, piT)
-                min_DCF, scores, labels = kfold(DTR, LTR,quadLogObj,options)
-                print(f"Log Reg min_DCF con K = {K} , pca = {pca}, l = {l} , piT = {piT}: {min_DCF} ")
+                          "znorm":False}
+                SVMObj = SVMClass(K_svm, C, piT)
+                min_DCF, scores, labels = kfold(DTR, LTR,SVMObj,options)
+                print(f"SVM min_DCF con K = {K} ,K_svm = {K_svm},  C = {C} , piT = {piT}, pca = {pca}: {min_DCF} ")
                 
                 if pca == 6:
-                    lr_pca6.append(min_DCF)
+                    svm_pca6.append(min_DCF)
                 if pca == 7:
-                    lr_pca7.append(min_DCF)
+                    svm_pca7.append(min_DCF)
                 if pca == 8:
-                    lr_pca8.append(min_DCF)
+                    svm_pca8.append(min_DCF)
                 if pca == 9:
-                    lr_pca9.append(min_DCF)
+                    svm_pca9.append(min_DCF)
                 if pca == None:
-                    lr_pcaNone.append(min_DCF)
+                    svm_pcaNone.append(min_DCF)
     
-    plt.semilogx(lamb,lr_pca6, label = "PCA 6")
-    plt.semilogx(lamb,lr_pca7, label = "PCA 7")
-    plt.semilogx(lamb,lr_pca8, label = "PCA 8")
-    plt.semilogx(lamb,lr_pca9, label = "PCA 9")
-    plt.semilogx(lamb,lr_pcaNone, label = "No PCA")
+    plt.semilogx(C,svm_pca6, label = "PCA 6")
+    plt.semilogx(C,svm_pca7, label = "PCA 7")
+    plt.semilogx(C,svm_pca8, label = "PCA 8")
+    plt.semilogx(C,svm_pca9, label = "PCA 9")
+    plt.semilogx(C,svm_pcaNone, label = "No PCA")
         
-    plt.xlabel("Lambda")
+    plt.xlabel("C")
     plt.ylabel("DCF_min")
     plt.legend()
     if piT == 0.1:
-        path = "plots/quadLogReg/DCF_su_lambda_piT_min"
+        path = "plots/svm/DCF_su_C_piT_min"
     if piT == 0.5:
-        path = "plots/quadLogReg/DCF_su_lambda_piT_medium"
+        path = "plots/svm/DCF_su_C_piT_medium"
     if piT == 0.9:
-        path = "plots/logReg/DCF_su_lambda_piT_max"
+        path = "plots/svm/DCF_su_C_piT_max"
     plt.title(piT)
     plt.savefig(path)
     plt.show()
+    
 
 
 ############################                     MODEL BUILDING         ############################################## 
