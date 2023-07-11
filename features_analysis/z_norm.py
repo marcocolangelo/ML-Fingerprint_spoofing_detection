@@ -20,13 +20,13 @@ def znorm_impl(DTR, DTE):
     return DTR_z, DTE_z
 
 def normalize_zscore(D, mu=[], sigma=[]):
-    print("D shape: "+str(D.shape))
+   # print("D shape: "+str(D.shape))
     if mu == [] or sigma == []:
         mu = np.mean(D, axis=1)
         sigma = np.std(D, axis=1)
     ZD = D
     ZD = ZD - mcol(mu)
     ZD = ZD / mcol(sigma)
-    print("ZD shape: "+str(ZD.shape))
+    #print("ZD shape: "+str(ZD.shape))
     return ZD, mu, sigma
 

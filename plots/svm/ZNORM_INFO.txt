@@ -1,0 +1,1 @@
+* Z-NORM dopo della PCA fornisce risultati migliori rispetto a quando si applica prima

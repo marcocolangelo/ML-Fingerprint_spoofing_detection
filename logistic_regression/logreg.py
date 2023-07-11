@@ -95,14 +95,14 @@ class quadLogRegClass:
         return J,grad
     
     def train(self,DTR,LTR):
-        print("In train")
+        # print("In train")
         self.DTR  = DTR
         self.LTR = LTR
         self.nt = DTR[:, LTR == 1].shape[1]
         self.nf = DTR.shape[1]-self.nt
         
-        print("nt: "+str(self.nt))
-        print("nf: "+str(self.nf))
+        # print("nt: "+str(self.nt))
+        # print("nf: "+str(self.nf))
         
         def vecxxT(x):
             x = x[:, None]

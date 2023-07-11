@@ -16,13 +16,13 @@ def rbf_kernel_with_bias(x1, x2,xi, gamma):
 
 class SVMClass:
     
-    def __init__(self,K,C,piT,mode):
+    def __init__(self,K,C,piT,mode,ci):
         self.K = K
         self.C = C
         self.piT = piT
         self.mode = mode
         self.alfa = []
-        self.ci  = 0
+        self.ci  = ci
         self.DTR = []
         self.LTR = []
         
@@ -74,7 +74,7 @@ class SVMClass:
 
     
     def train(self,DTR,LTR):
-        print("dentro train")
+        # print("dentro train")
         self.DTR = DTR
         self.LTR = LTR
         
@@ -86,9 +86,7 @@ class SVMClass:
         Ct = self.C * self.piT / emp_prior_t
        
         xi = self.K * self.K
-        ci = 0
-        self.ci = ci
-        H_=self.compute_H(DTR,LTR,self.kernel_func,xi,ci)
+        H_=self.compute_H(DTR,LTR,self.kernel_func,xi,self.ci)
         compute_lag=self.compute_lagrangian_wrapper(H_)
         bound_list=[(-1,-1)]*DTR.shape[1]
         
@@ -104,8 +102,8 @@ class SVMClass:
         self.alfa = alfa
         
     def compute_scores(self,DTE):
-        print("dentro comp_score")
-        score=numpy.array([self.compute_kernel_score(self.alpha,self.DTR,self.LTR,self.kernel_func,x,self.K*self.K,self.ci) for x in DTE.T])
+        # print("dentro comp_score")
+        score=numpy.array([self.compute_kernel_score(self.alfa,self.DTR,self.LTR,self.kernel_func,x,self.K*self.K,self.ci) for x in DTE.T])
         return score
 
 

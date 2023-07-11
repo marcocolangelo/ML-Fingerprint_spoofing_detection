@@ -89,13 +89,14 @@ def kfold(D, L,classifier, options):
            # DTE, mu, sigma = normalize_zscore(DTE, mu, sigma)
             
             
+            if znorm == True:
+                DTR,mu,sigma= normalize_zscore(DTR)
+                DTE,_,_ = normalize_zscore(DTE,mu,sigma)
+            
             if pca is not None: #PCA needed
                 DTR, P = PCA_impl(DTR, pca)
                 DTE = numpy.dot(P.T, DTE)
                 
-            if znorm == True:
-                DTR,mu,sigma= normalize_zscore(DTR)
-                DTE,_,_ = normalize_zscore(DTE,mu,sigma)
                 
             classifier.train(DTR, LTR)
             

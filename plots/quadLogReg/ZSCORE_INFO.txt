@@ -1,0 +1,7 @@
+Nei risultati qui avevo applicato PCA e poi ZNORM.
+
+In base ai casi è meglio scegliere un ordine rispetto ad un altro:
+
+- LR LINEARE : meglio zscore e poi PCA per ridurre la dimensionalità delle feature e rimuovere le correlazioni tra di esse
+
+- LR QUADRATICA : per ridurre l’effetto della scala delle feature sulle funzioni quadratiche. Questo può migliorare la stabilità numerica del modello e rendere più efficace la regolarizzazione.

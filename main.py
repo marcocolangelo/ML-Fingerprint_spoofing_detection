@@ -9,6 +9,7 @@ from evaluation_functions.evaluation import *
 from validation.k_fold import *
 from logistic_regression.logreg import logRegClass,quadLogRegClass
 from svm.svm import SVMClass
+from svm.svm_kernel import SVMClass
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -164,114 +165,253 @@ if __name__=='__main__':
 
                                         ####### QUAD LOG REG   #######
 # K=  5
-# piT = 0.1
-# lamb  =np.logspace(-7, 2, num=9)
-# for piT in [0.1,0.33,0.5,0.9]:
-#     lr_pca6 = []
-#     lr_pca7 = []
-#     lr_pca8 = []
-#     lr_pca9 = []
-#     lr_pcaNone = []
-#     for l in np.logspace(-6, 2, num=9):
-#         #we saw that piT=0.1 is the best value
-#             for pca in [6,7,8,9,None]:
-#                 options={"K":5,
-#                           "pca":pca,
-#                           "pi":0.5,
-#                           "costs":(1,10),
-#                           "znorm":False}
-#                 quadLogObj = quadLogRegClass(l, piT)
-#                 min_DCF, scores, labels = kfold(DTR, LTR,quadLogObj,options)
-#                 print(f"Log Reg min_DCF con K = {K} , pca = {pca}, l = {l} , piT = {piT}: {min_DCF} ")
-                
-#                 if pca == 6:
-#                     lr_pca6.append(min_DCF)
-#                 if pca == 7:
-#                     lr_pca7.append(min_DCF)
-#                 if pca == 8:
-#                     lr_pca8.append(min_DCF)
-#                 if pca == 9:
-#                     lr_pca9.append(min_DCF)
-#                 if pca == None:
-#                     lr_pcaNone.append(min_DCF)
-    
-#     plt.semilogx(lamb,lr_pca6, label = "PCA 6")
-#     plt.semilogx(lamb,lr_pca7, label = "PCA 7")
-#     plt.semilogx(lamb,lr_pca8, label = "PCA 8")
-#     plt.semilogx(lamb,lr_pca9, label = "PCA 9")
-#     plt.semilogx(lamb,lr_pcaNone, label = "No PCA")
+# lamb  =np.logspace(-4, 2, num=7)
+# lr_pca6_glob = []
+# lr_pca7_glob = []
+# lr_pca8_glob = []
+# lr_pca9_glob = []
+# lr_pcaNone_glob = []
+
+# for pi in [0.1]:
+#     for piT in [0.9]:
+#         lr_pca6 = []
+#         lr_pca7 = []
+#         lr_pca8 = []
+#         lr_pca9 = []
+#         lr_pcaNone = []
+#         for zscore in [False]:
+#             for l in [0.01]:
+#                 #we saw that piT=0.1 is the best value
+#                     for pca in [6]:
+                    
+#                         # pi = 0.5
+#                         options={"K":5,
+#                                   "pca":pca,
+#                                   "pi":pi,
+#                                   "costs":(1,10),
+#                                   "znorm":zscore}
+#                         quadLogObj = quadLogRegClass(l, piT)
+#                         min_DCF, scores, labels = kfold(DTR, LTR,quadLogObj,options)
+#                         print(f"Log Reg min_DCF con K = {K} , pca = {pca}, l = {l} , piT = {piT}, pi = {pi} zscore={zscore}: {min_DCF} ")
+                        
+#                         if pca == 6:
+#                             lr_pca6.append(min_DCF)
+#                         if pca == 7:
+#                             lr_pca7.append(min_DCF)
+#                         if pca == 8:
+#                             lr_pca8.append(min_DCF)
+#                         if pca == 9:
+#                             lr_pca9.append(min_DCF)
+#                         if pca == None:
+#                             lr_pcaNone.append(min_DCF)
         
-#     plt.xlabel("Lambda")
+#         lr_pca6_glob.append((f"Log Reg min_DCF con K = {K} , pca = 6, piT = {piT} pi={pi} zscore={zscore}",lr_pca6))
+#         lr_pca7_glob.append((f"Log Reg min_DCF con K = {K} , pca = 7, piT = {piT} pi={pi}",lr_pca7))
+#         lr_pca8_glob.append((f"Log Reg min_DCF con K = {K} , pca = 8, piT = {piT} pi={pi}",lr_pca8))
+#         lr_pca9_glob.append((f"Log Reg min_DCF con K = {K} , pca = 9, piT = {piT} pi={pi}",lr_pca9))
+#         lr_pcaNone_glob.append((f"Log Reg min_DCF con K = {K} , pca = no, piT = {piT} pi={pi}",lr_pcaNone))
+        
+#         # plt.semilogx(lamb,lr_pca6, label = "PCA 6")
+#         # plt.semilogx(lamb,lr_pca7, label = "PCA 7")
+#         # plt.semilogx(lamb,lr_pca8, label = "PCA 8")
+#         # plt.semilogx(lamb,lr_pca9, label = "PCA 9")
+#         # plt.semilogx(lamb,lr_pcaNone, label = "No PCA")
+            
+#         # plt.xlabel("Lambda")
+#         # plt.ylabel("DCF_min")
+#         # plt.legend()
+#         if piT == 0.1:
+#             path = "plots/quadLogReg/copy/DCF_su_lambda_piT_min"
+#         if piT == 0.33:
+#             path = "plots/quadLogReg/copy/DCF_su_lambda_piT_033"
+#         if piT == 0.5:
+#             path = "plots/quadLogReg/copy/DCF_su_lambda_piT_medium"
+#         if piT == 0.9:
+#             path = "plots/quadLogReg/copy/DCF_su_lambda_piT_max"
+            
+#         # plt.title(piT)
+#         #plt.savefig(path)
+#         # plt.show()
+        
+                                            #######  LINEAR SVM   #######
+# K=  5
+# piT = 0.1
+# for piT in [0.1]:
+#     svm_pca6_no_zscore = []
+#     svm_pca6_zscore = []
+#     svm_pca6 = []
+#     svm_pca7 = []
+#     svm_pca8 = []
+#     svm_pca9 = []
+#     svm_pcaNone = []
+#     C_values = np.logspace(-5, 2, num=8)
+#     for C in np.logspace(-5, 2, num=8):
+#         for K_svm in [1]:
+#             for zscore in [True,False]:
+#             #we saw that piT=0.1 is the best value
+#                 for pca in [6]:
+#                     pi = 0.5
+#                     znorm=True
+#                     options={"K":5,
+#                               "pca":pca,
+#                               "pi":pi,
+#                               "costs":(1,10),
+#                               "znorm":zscore}
+#                     SVMObj = SVMClass(K_svm, C, piT)
+#                     min_DCF, scores, labels = kfold(DTR, LTR,SVMObj,options)
+#                     if min_DCF > 1: 
+#                         min_DCF = 1
+#                     print(f"SVM min_DCF con K = {K} ,K_svm = {K_svm},  C = {C} , piT = {piT}, pca = {pca}, pi={pi}, znorm={zscore}: {min_DCF} ")
+                    
+#                     if pca == 6:
+#                         if zscore == False:
+#                             svm_pca6_no_zscore.append(min_DCF)
+#                         else:
+#                             svm_pca6_zscore.append(min_DCF)
+#                     if pca == 7:
+#                         svm_pca7.append(min_DCF)
+#                     if pca == 8:
+#                         svm_pca8.append(min_DCF)
+#                     if pca == 9:
+#                         svm_pca9.append(min_DCF)
+#                     if pca == None:
+#                         svm_pcaNone.append(min_DCF)
+                        
+                    
+                       
+                
+    
+#     plt.semilogx(C_values,svm_pca6_no_zscore, label = "PCA 6")
+#     plt.semilogx(C_values,svm_pca6_zscore, label = "PCA 6 - Z_NORM")
+#     #plt.semilogx(C_values,svm_pca8, label = "PCA 8")
+#     #plt.semilogx(C_values,svm_pca9, label = "PCA 9")
+#     #plt.semilogx(C_values,svm_pcaNone, label = "No PCA")
+        
+#     plt.xlabel("C")
 #     plt.ylabel("DCF_min")
 #     plt.legend()
 #     if piT == 0.1:
-#         path = "plots/quadLogReg/znorm/DCF_su_lambda_piT_min_znorm"
+#         path = "plots/svm/DCF_su_C_piT_min"
+#     if piT == 0.33:
+#         path = "plots/svm/DCF_su_C_piT_033"
 #     if piT == 0.5:
-#         path = "plots/quadLogReg/znorm/DCF_su_lambda_piT_medium_znorm"
+#         path = "plots/svm/DCF_su_C_piT_medium"
 #     if piT == 0.9:
-#         path = "plots/quadLogReg/znorm/DCF_su_lambda_piT_max_znorm"
+#         path = "plots/svm/DCF_su_C_piT_max"
+        
+    
+#     path = path + "_znorm"
+    
 #     plt.title(piT)
 #     plt.savefig(path)
 #     plt.show()
-        
-                                            #######   SVM   #######
+    
+
+                                        ############ KERNEL SVM  ############
+
 K=  5
 piT = 0.1
-for piT in [0.1,0.33,0.5,0.9]:
-    svm_pca6 = []
-    svm_pca7 = []
-    svm_pca8 = []
-    svm_pca9 = []
-    svm_pcaNone = []
-    C_values = np.logspace(-5, 2, num=8)
-    for C in np.logspace(-5, 2, num=8):
-        for K_svm in [1]:
-        #we saw that piT=0.1 is the best value
-            for pca in [6,8]:
-                options={"K":5,
-                          "pca":pca,
-                          "pi":0.5,
-                          "costs":(1,10),
-                          "znorm":False}
-                SVMObj = SVMClass(K_svm, C, piT)
-                min_DCF, scores, labels = kfold(DTR, LTR,SVMObj,options)
-                if min_DCF > 1: 
-                    min_DCF = 1
-                print(f"SVM min_DCF con K = {K} ,K_svm = {K_svm},  C = {C} , piT = {piT}, pca = {pca}: {min_DCF} ")
+poly_svm_pca6={}
+poly_svm_pca8={}
+poly_svm_pcaNone={}
+rbf_svm_pca6 = {}
+rbf_svm_pca8 = {}
+rbf_svm_pcaNone = {}
+for piT in [0.1]:
+    for kernel in ["poly"]:
+        if kernel=="poly":
+            ci=[0,1]
+            string="d=2 c= "
+        else:
+            ci=[0.01,0.001,0.0001]
+            string="gamma= "
+        for value in ci:  
+            svm_pca6 = []
+            svm_pca6_noznorm = []
+            svm_pcaNone = []
+            svm_pcaNone_noznorm = []
+            #svm_pcaNone = []
+            C_values = np.logspace(-3, -1, num=3)
+            for C in np.logspace(-3, -1, num=3):
+                for K_svm in [1]:
+                #we saw that piT=0.1 is the best value
+                    for pca in [6,None]:
+                        for znorm in [False,True]:
+                            options={"K":5,
+                                      "pca":pca,
+                                      "pi":0.5,
+                                      "costs":(1,10),
+                                      "znorm":znorm}
+                            SVMObj = SVMClass(K_svm, C, piT,kernel,value)
+                            min_DCF, scores, labels = kfold(DTR, LTR,SVMObj,options)
+                            if min_DCF > 1: 
+                                min_DCF = 1
+                            
+                            print(f"SVM min_DCF kernel={kernel} ({string } {value}) con K = {K} ,K_svm = {K_svm},  C = {C} , piT = {piT}, pca = {pca}: {min_DCF} znorm: {znorm}")
+                            
+                            if pca == 6:
+                                if znorm==True:
+                                    svm_pca6.append(min_DCF)
+                                    if kernel=="poly" :
+                                        poly_svm_pca6.setdefault(f"SVM min_DCF kernel={kernel} ({string} {value}) con K = {K} ,K_svm = {K_svm},  C = {C} , piT = {piT}, pca = {pca}: {min_DCF} Znorm",min_DCF)
+                            #     else:
+                            #         rbf_svm_pca6.setdefault(f"SVM min_DCF kernel={kernel} ({string } {value}) con K = {K} ,K_svm = {K_svm},  C = {C} , piT = {piT}, pca = {pca}: {min_DCF} no Znorm",min_DCF)
+                                else:
+                                    svm_pca6_noznorm.append(min_DCF)
+                                    if kernel=="poly" :
+                                        poly_svm_pca6.setdefault(f"SVM min_DCF kernel={kernel} ({string } {value}) con K = {K} ,K_svm = {K_svm},  C = {C} , piT = {piT}, pca = {pca}: {min_DCF} no Znorm",min_DCF)
+                                # else:
+                                #     rbf_svm_pca6.setdefault(f"SVM min_DCF kernel={kernel} ({string } {value}) con K = {K} ,K_svm = {K_svm},  C = {C} , piT = {piT}, pca = {pca}: {min_DCF} Znorm",min_DCF)
+                                
+                            # if pca == 7: 
+                            #     svm_pca7.append(min_DCF)
+                            # if pca == 8:
+                            #     svm_pca8.append(min_DCF)
+                            #     if kernel=="poly" :
+                            #         poly_svm_pca8.setdefault(f"SVM min_DCF kernel={kernel} ({string } {value}) con K = {K} ,K_svm = {K_svm},  C = {C} , piT = {piT}, pca = {pca}: {min_DCF} ",min_DCF)
+                            #     else:
+                            #         rbf_svm_pca8.setdefault(f"SVM min_DCF kernel={kernel} ({string } {value}) con K = {K} ,K_svm = {K_svm},  C = {C} , piT = {piT}, pca = {pca}: {min_DCF} ",min_DCF)
+                            # # if pca == 9:
+                            # #     svm_pca9.append(min_DCF)
+                            if pca == None:
+                                if znorm==True:
+                                    svm_pcaNone.append(min_DCF)
+                                    if kernel=="poly" :
+                                        poly_svm_pcaNone.setdefault(f"SVM min_DCF kernel={kernel} ({string } {value}) con K = {K} ,K_svm = {K_svm},  C = {C} , piT = {piT}, pca = {pca}: {min_DCF} Znorm",min_DCF)
+                                    # else:
+                                    #     rbf_svm_pcaNone.setdefault(f"SVM min_DCF kernel={kernel} ({string } {value}) con K = {K} ,K_svm = {K_svm},  C = {C} , piT = {piT}, pca = {pca}: {min_DCF} ",min_DCF)
+                                else:
+                                    svm_pcaNone_noznorm.append(min_DCF)
+                                    if kernel=="poly" :
+                                        poly_svm_pcaNone.setdefault(f"SVM min_DCF kernel={kernel} ({string } {value}) con K = {K} ,K_svm = {K_svm},  C = {C} , piT = {piT}, pca = {pca}: {min_DCF} no Znorm",min_DCF)
+                                    
+            plt.semilogx(C_values,svm_pca6, label = "PCA 6")
+            #plt.semilogx(C_values,svm_pca7, label = "PCA 7")
+            plt.semilogx(C_values,svm_pca6_noznorm, label = "PCA 6 No Znorm")
+            #plt.semilogx(C_values,svm_pca9, label = "PCA 9")
+            plt.semilogx(C_values,svm_pcaNone, label = "No PCA")
+            plt.semilogx(C_values,svm_pcaNone_noznorm, label = "No PCA No Znorm")
                 
-                if pca == 6:
-                    svm_pca6.append(min_DCF)
-                if pca == 7:
-                    svm_pca7.append(min_DCF)
-                if pca == 8:
-                    svm_pca8.append(min_DCF)
-                if pca == 9:
-                    svm_pca9.append(min_DCF)
-                if pca == None:
-                    svm_pcaNone.append(min_DCF)
-    
-    plt.semilogx(C_values,svm_pca6, label = "PCA 6")
-    plt.semilogx(C_values,svm_pca7, label = "PCA 7")
-    plt.semilogx(C_values,svm_pca8, label = "PCA 8")
-    plt.semilogx(C_values,svm_pca9, label = "PCA 9")
-    plt.semilogx(C_values,svm_pcaNone, label = "No PCA")
-        
-    plt.xlabel("C")
-    plt.ylabel("DCF_min")
-    plt.legend()
-    if piT == 0.1:
-        path = "plots/svm/DCF_su_C_piT_min"
-    if piT == 0.33:
-        path = "plots/svm/DCF_su_C_piT_033"
-    if piT == 0.5:
-        path = "plots/svm/DCF_su_C_piT_medium"
-    if piT == 0.9:
-        path = "plots/svm/DCF_su_C_piT_max"
-    
-    plt.title(piT)
-    plt.savefig(path)
-    plt.show()
-    
+            plt.xlabel("C")
+            plt.ylabel("DCF_min")
+            plt.legend()
+            # if piT == 0.1:
+            #     path = "plots/svm/DCF_su_C_piT_min"
+            # if piT == 0.33:
+            #     path = "plots/svm/DCF_su_C_piT_033"
+            # if piT == 0.5:
+            #     path = "plots/svm/DCF_su_C_piT_medium"
+            # if piT == 0.9:
+            #     path = "plots/svm/DCF_su_C_piT_max"
+            if kernel=="rbf":
+                gamma=" gamma : "+str(value)
+            else:
+                gamma=" ci: " +str(value)
+                
+            title=str(piT)+" "+str(kernel)+" "+str(gamma)
+            plt.title(title)
+            # plt.savefig(path)
+            plt.show()
 
 
 ############################                     MODEL BUILDING         ############################################## 
