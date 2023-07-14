@@ -1,4 +1,3 @@
-import sklearn.datasets
 import numpy
 import scipy.optimize
 
@@ -22,7 +21,7 @@ class SVMClass:
         self.piT = piT
         self.mode = mode
         self.alfa = []
-        self.ci  = ci
+        self.ci  = ci               #if you use mode = "rbf" this is used as GAMMA
         self.DTR = []
         self.LTR = []
         

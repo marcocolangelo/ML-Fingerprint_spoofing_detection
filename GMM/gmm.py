@@ -51,7 +51,7 @@ class GMMClass:
         # self.tiedness = tiedness        #boolean
         
         self.eff_prior = (prior*Cfn)/(prior*Cfn + (1-prior)*Cfp)
-        print("eff prior: "+str(self.eff_prior))
+        # print("eff prior: "+str(self.eff_prior))
         
     #we train two different GMM (1 for the target class and one for the non target class)    
     def train(self, DTR, LTR):
@@ -134,9 +134,9 @@ class GMMClass:
             #     print("Male")
             
             if np.mean(new_loss)-np.mean(old_loss)<1e-6:
-                print("EM terminato")
+                # print("EM terminato")
                 break
-        print(np.mean(new_loss))
+        # print(np.mean(new_loss))
         return gmm 
     
     def EM_Diag_GMM(self,X, gmm,psi): #gmm list of tuple
@@ -189,9 +189,9 @@ class GMMClass:
             # if np.mean(new_loss)-np.mean(old_loss)<0:
             #     print("MALE")    
             if np.mean(new_loss)-np.mean(old_loss)<1e-6:
-                print("EM terminato")
+               # print("EM terminato")
                 break
-        print(np.mean(new_loss))
+       # print(np.mean(new_loss))
         return gmm     
     
     def EM_TiedCov_GMM(self,X, gmm,psi): #gmm list of tuple
@@ -245,9 +245,9 @@ class GMMClass:
             # if np.mean(new_loss)-np.mean(old_loss)<0:
             #     # print("MALE")      
             if np.mean(new_loss)-np.mean(old_loss)<1e-6:
-                print("EM terminato")
+                # print("EM terminato")
                 break
-        print(np.mean(new_loss))
+        # print(np.mean(new_loss))
         return gmm    
     
     def LBG(self,X,psi,alpha=0.1,num_components_max=4):
@@ -328,8 +328,8 @@ class GMMClass:
                 new_gmm.append((new_w,vcol(mu_new_1),gmm_start[index_component][2]))
                 new_gmm.append((new_w,vcol(mu_new_2),gmm_start[index_component][2]))
             gmm_start = new_gmm 
-            print("GMMMM START....")
-            print(len(gmm_start))
+            # print("GMMMM START....")
+            # print(len(gmm_start))
         return gmm_start
     
     def TiedCov_LBG(self,X,psi,alpha=0.1,num_components_max=4):

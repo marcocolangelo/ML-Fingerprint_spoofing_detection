@@ -1,0 +1,1 @@
+('GMM min_DCF mode_target=diag e mode_not_target=diag con K = 5 , nt_max_n=8 t_max_n=2 pca = None: 0.23522540983606557 znorm: False', 0.23522540983606557)

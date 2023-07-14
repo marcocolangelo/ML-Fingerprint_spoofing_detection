@@ -1,0 +1,1 @@
+RBF con K = 0, gamma = 1e-3, C = 10, PCA = 6, piT = 0.1, No-ZSCORE, DCF = 0.2877

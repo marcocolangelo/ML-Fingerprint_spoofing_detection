@@ -45,19 +45,21 @@ def ROC_plot(thresholds,post_prob,LTE):
         FNR.append(cm[0,1]/(cm[0,1]+cm[1,1]))
         FPR.append(cm[1,0]/(cm[1,0]+cm[0,0]))
         
-    plt.figure()
-    plt.xlabel("FPR")
-    plt.ylabel("TPR")
+    # plt.figure()
+    # plt.xlabel("FPR")
+    # plt.ylabel("TPR")
     TPR=1-np.array(FNR)
-    plt.plot(FPR,TPR,scalex=False,scaley=False)
-    plt.show()
+    # plt.plot(FPR,TPR,scalex=False,scaley=False)
+    # plt.show()
+    
+    return FPR,TPR
     
 #compute Bayes error plot
 def Bayes_plot(llr,LTE):
     effPriorLogOdds = np.linspace(-3, 3,21)
     DCF_effPrior = {}
     DCF_effPrior_min = {}
-
+    print("In bayes_plot")
     #I try to compute DCF using several possible effPriorLogOdd values
     for p in effPriorLogOdds:
        
@@ -98,7 +100,8 @@ def Bayes_plot(llr,LTE):
     plt.ylim([0, 1.1])
     plt.xlim([-3, 3])
     plt.legend()
-
+    plt.show()
+    
     return DCF_effPrior,DCF_effPrior_min
 
 #should return DCF_norm NOT CALIBRATED
@@ -213,3 +216,4 @@ def DCF_min_impl(llr,label,prior,Cfp,Cfn):
     
 #     Bayes_DCF,Bayes_DCF_min = Bayes_plot(infpar_llr,infpar_label)
         
+

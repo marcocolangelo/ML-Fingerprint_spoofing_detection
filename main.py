@@ -11,6 +11,7 @@ from logistic_regression.logreg import logRegClass,quadLogRegClass
 from svm.svm import SVMClass
 from svm.svm_kernel import SVMClass
 from GMM.gmm import GMMClass
+from calibration.calibration import *
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -24,30 +25,30 @@ if __name__=='__main__':
     
     #plotSingle(DTR, LTR,10)
     # plotCross(DTR, LTR,10)
-    DC = centerData(DTR)              #delete the mean component from the data
+    # DC = centerData(DTR)              #delete the mean component from the data
     
 ## plot the features
     # plotSingle(DC, LTR,10)
     # plotCross(DC, LTR,10)
        
-    mp = 6
+    # mp = 6
 ## PCA implementation
-    DP,P = PCA_impl(DTR, mp)        #try with 2-dimension subplot
-    DTEP = np.dot(P.T,DTE)
+    # DP,P = PCA_impl(DTR, mp)        #try with 2-dimension subplot
+    # DTEP = np.dot(P.T,DTE)
     
     # plotCross(DP,LTR,m)        #plotting the data on a 2-D cartesian graph
     # plotSingle(DP, LTR,m)
     
-    ml = 5
+    # ml = 5
 ## LDA implementation
-    DW,W = LDA_impl(DTR,LTR,ml)
-    DTEW = np.dot(W.T,DTE)
+    # DW,W = LDA_impl(DTR,LTR,ml)
+    # DTEW = np.dot(W.T,DTE)
     #plotCross(DW,LTR,m)
     #plotSingle(DW, LTR, m)
     
 ## LDA + PCA implementation
-    DPW,W = LDA_impl(DP,LTR,ml)
-    DTEPW = np.dot(W.T,DTEP)
+    # DPW,W = LDA_impl(DP,LTR,ml)
+    # DTEPW = np.dot(W.T,DTEP)
     
 ## Pearson correlation
     #Pearson_corr(DTR, LTR)
@@ -57,17 +58,17 @@ if __name__=='__main__':
     #PCA_plot(DTR)
     
 ############################                          K-FOLD                  #########################################
-    prior,Cfp,Cfn = (0.5,10,1)
+#     prior,Cfp,Cfn = (0.5,10,1)
 # options={"K":5,
 #           "pca":6,
 #           "pi":0.5,
 #           "costs":(1,10)}
-                                ###### MVG  #####
+                                ##### MVG  #####
 # K = 5
-# MVG_obj = GaussClass("MVG")
-# NB_obj = GaussClass("NB")
-# TCG_obj = GaussClass("TCG")
-# TCGNB_obj = GaussClass("TCGNB") 
+# MVG_obj = GaussClass("MVG",prior,Cfp,Cfn)
+# NB_obj = GaussClass("NB",prior,Cfp,Cfn)
+# TCG_obj = GaussClass("TCG",prior,Cfp,Cfn)
+# TCGNB_obj = GaussClass("TCGNB",prior,Cfp,Cfn) 
 
 # mvg_pca6 = 0
 # mvg_pca7 = 0
@@ -80,6 +81,7 @@ if __name__=='__main__':
 #         options={"K":5,
 #                   "pca":pca,
 #                   "pi":0.5,
+#                   "znorm": False,
 #                   "costs":(1,10)}
         
 #         min_DCF, scores, labels = kfold(DTR, LTR, model,options)
@@ -106,9 +108,9 @@ if __name__=='__main__':
 #     plt.ylabel("DCF_min")
 #     #plt.legend()
 #     plt.title(model.name())
-#     path= "plots/gaussian/"+str(model.name())
+#     # path= "plots/gaussian/"+str(model.name())
 #     plt.plot(np.linspace(6,10,5),mvg_pca)
-#     plt.savefig(path)
+#     # plt.savefig(path)
 #     plt.show()
     
         
@@ -416,79 +418,101 @@ if __name__=='__main__':
 
 
                                     ###############   GMM   ###############
-K=  5
-prior = 0.5
-Cfp = 10
-Cfn = 1
-gmm_pca6=[]
-gmm_pca7=[]
-gmm_pca8=[]
-gmm_pca9=[]
-gmm_pcaNone=[]
+# K=  5
+# prior = 0.5
+# Cfp = 10
+# Cfn = 1
+# gmm_pca6_glob={}
+# gmm_pca7_glob={}
+# gmm_pca8_glob={}
+# gmm_pca9_glob={}
+# gmm_pcaNone_glob={}
 
 
-for mode_target in ["full","diag","tied"]:
-    for mode_not_target in ["full","diag","tied"]:
-        gmm_pca6=[]
-        gmm_pca7=[]
-        gmm_pca8=[]
-        gmm_pca9=[]
-        gmm_pcaNone=[]
-        for pca in [6,7,8,9,None]:
-            for t_max_n in [1,2] :
-                for nt_max_n in [2,4,8]:
-                    for znorm in [False]:
-                        alfa = 0.1
-                        psi = 0.01
-                        options={"K":5,
-                                  "pca":pca,
-                                  "pi":0.5,
-                                  "costs":(1,10),
-                                  "znorm":znorm}
+# for mode_target in ["diag","tied"]:
+#     for mode_not_target in ["full","diag","tied"]:
+#         gmm_pca6=[]
+#         gmm_pca7=[]
+#         gmm_pca8=[]
+#         gmm_pca9=[]
+#         gmm_pcaNone=[]
+#         for pca in [6,8,None]:
+#             for t_max_n in [1,2] :
+#                 gmm_tmp = []
+#                 for nt_max_n in [2,4,8]:
+#                     for znorm in [False]:
+#                         alfa = 0.1
+#                         psi = 0.01
+#                         options={"K":5,
+#                                   "pca":pca,
+#                                   "pi":0.5,
+#                                   "costs":(1,10),
+#                                   "znorm":znorm}
                        
-                        GMMObj = GMMClass(t_max_n, nt_max_n, mode_target, mode_not_target, psi, alfa, prior, Cfp, Cfn) 
-                        min_DCF, scores, labels = kfold(DTR, LTR,GMMObj,options)
-                        # if min_DCF > 1: 
-                        #     min_DCF = 1
+#                         GMMObj = GMMClass(t_max_n, nt_max_n, mode_target, mode_not_target, psi, alfa, prior, Cfp, Cfn) 
+#                         min_DCF, scores, labels = kfold(DTR, LTR,GMMObj,options)
+#                         # if min_DCF > 1: 
+#                         #     min_DCF = 1
                         
-                        print(f"GMM min_DCF mode_target={mode_target} e mode_not_target={mode_not_target} con K = {K} , nt_max_n={nt_max_n} t_max_n={t_max_n} pca = {pca}: {min_DCF} znorm: {znorm}")
+#                         print(f"GMM min_DCF mode_target={mode_target} e mode_not_target={mode_not_target} con K = {K} , nt_max_n={nt_max_n} t_max_n={t_max_n} pca = {pca}: {min_DCF} znorm: {znorm}")
                     
-                        if pca == 6:
-                            # if znorm==True:
-                            gmm_pca6.append(min_DCF)
-                            # else:
-                            #     gmm_pca6_noznorm.append(min_DCF)
+#                         #un vettore che si annulla ad ogni nuovo t_max_n
+#                         gmm_tmp.append(min_DCF)
+#                         if pca == 6:
+#                             # if znorm==True:
+                            
+#                             gmm_pca6.append(min_DCF)
+#                             gmm_pca6_glob.setdefault((f"GMM min_DCF mode_target={mode_target} e mode_not_target={mode_not_target} con K = {K} , nt_max_n={nt_max_n} t_max_n={t_max_n} pca = {pca}: {min_DCF} znorm: {znorm}",min_DCF))
+
+#                             # else:
+#                             #     gmm_pca6_noznorm.append(min_DCF)
                           
-                        if pca == 7: 
-                            gmm_pca7.append(min_DCF)
-                        if pca == 8:
-                            gmm_pca8.append(min_DCF)
-                        #     if kernel=="poly" :
-                        #         poly_svm_pca8.setdefault(f"SVM min_DCF kernel={kernel} ({string } {value}) con K = {K} ,K_svm = {K_svm},  C = {C} , piT = {piT}, pca = {pca}: {min_DCF} ",min_DCF)
-                        #     else:
-                        #         rbf_svm_pca8.setdefault(f"SVM min_DCF kernel={kernel} ({string } {value}) con K = {K} ,K_svm = {K_svm},  C = {C} , piT = {piT}, pca = {pca}: {min_DCF} ",min_DCF)
-                        if pca == 9:
-                            gmm_pca9.append(min_DCF)
-                        if pca == None:
-                            # if znorm==True:
-                            gmm_pcaNone.append(min_DCF)
-                            # else:
-                            #     gmm_pcaNone_noznorm.append(min_DCF)
-                                
-                # Creazione del grafico
-                fig = plt.figure()
-                ax = fig.add_subplot(111, projection='3d')
+#                         # if pca == 7: 
+#                         #     gmm_pca7.append(min_DCF)
+#                         #     gmm_pca7_glob.setdefault((f"GMM min_DCF mode_target={mode_target} e mode_not_target={mode_not_target} con K = {K} , nt_max_n={nt_max_n} t_max_n={t_max_n} pca = {pca}: {min_DCF} znorm: {znorm}",min_DCF))
+
+#                         if pca == 8:
+#                             gmm_pca8.append(min_DCF)
+#                             gmm_pca8_glob.setdefault((f"GMM min_DCF mode_target={mode_target} e mode_not_target={mode_not_target} con K = {K} , nt_max_n={nt_max_n} t_max_n={t_max_n} pca = {pca}: {min_DCF} znorm: {znorm}",min_DCF))
+
+#                         #     if kernel=="poly" :
+#                         #         poly_svm_pca8.setdefault(f"SVM min_DCF kernel={kernel} ({string } {value}) con K = {K} ,K_svm = {K_svm},  C = {C} , piT = {piT}, pca = {pca}: {min_DCF} ",min_DCF)
+#                         #     else:
+#                         #         rbf_svm_pca8.setdefault(f"SVM min_DCF kernel={kernel} ({string } {value}) con K = {K} ,K_svm = {K_svm},  C = {C} , piT = {piT}, pca = {pca}: {min_DCF} ",min_DCF)
+#                         # if pca == 9:
+#                         #     gmm_pca9.append(min_DCF)
+#                         #     gmm_pca9_glob.setdefault((f"GMM min_DCF mode_target={mode_target} e mode_not_target={mode_not_target} con K = {K} , nt_max_n={nt_max_n} t_max_n={t_max_n} pca = {pca}: {min_DCF} znorm: {znorm}",min_DCF))
+
+#                         if pca == None:
+#                             # if znorm==True:
+#                             gmm_pcaNone.append(min_DCF)
+#                             gmm_pcaNone_glob.setdefault((f"GMM min_DCF mode_target={mode_target} e mode_not_target={mode_not_target} con K = {K} , nt_max_n={nt_max_n} t_max_n={t_max_n} pca = {pca}: {min_DCF} znorm: {znorm}",min_DCF))
+
+#                             # else:
+#                             #     gmm_pcaNone_noznorm.append(min_DCF)
+            
+#                 fig = plt.figure()
+#                 plt.plot([2,4,8],gmm_tmp)
+#                 plt.xlabel("nt_max_n")
+#                 plt.ylabel("DCF_min")
+#                 titolo = f"mode_target: {mode_target}, mode_non_target:{mode_not_target} PCA: {pca}, t_max_n: {t_max_n}"
+#                 plt.title(titolo)
+#                 plt.show()
                 
-                # Aggiunta dei dati al grafico
-                ax.scatter(t_max_n, min_DCF, nt_max_n)
-                
-                # Impostazione delle etichette degli assi
-                ax.set_xlabel('t_max_n')
-                ax.set_ylabel('DCF_min')
-                ax.set_zlabel('nt_max_n')
-                name_graph="GMM "+mode_target+" "+mode_not_target
-                plt.title(name_graph)
-                plt.show()
+#             # Creazione del grafico
+#             fig = plt.figure()
+#             ax = fig.add_subplot(111, projection='3d')
+            
+#             # Aggiunta dei dati al grafico
+#             ax.scatter(t_max_n, min_DCF, nt_max_n)
+            
+#             # Impostazione delle etichette degli assi
+#             ax.set_xlabel('t_max_n')
+#             ax.set_ylabel('DCF_min')
+#             ax.set_zlabel('nt_max_n')
+#             name_graph="GMM "+mode_target+" "+mode_not_target
+#             plt.title(name_graph)
+#             plt.show()
                         # plt.semilogx(C_values,svm_pca6, label = "PCA 6")
                         # #plt.semilogx(C_values,svm_pca7, label = "PCA 7")
                         # plt.semilogx(C_values,svm_pca6_noznorm, label = "PCA 6 No Znorm")
@@ -516,95 +540,105 @@ for mode_target in ["full","diag","tied"]:
 
 ############################                     MODEL BUILDING         ############################################## 
 
-                                    ############      MVG      ##################
-# log_pred_MVG = MVG_approach(DTR, LTR, 0.5, DTE, LTE)
-# acc_MVG,_= accuracy(log_pred_MVG,LTE)
-# inacc_MVG = 1-acc_MVG
-# print("Error rate MVG no PCA : "+str(inacc_MVG*100))
-
-# log_pred_MVG = MVG_approach(DP, LTR, 0.5, DTEP, LTE)
-# acc_MVG,_= accuracy(log_pred_MVG,LTE)
-# inacc_MVG = 1-acc_MVG
-# print("Error rate MVG PCA con mp = "+ str(mp)+ " ml: "+ str(ml) +" : "+str(inacc_MVG*100))
-
-# # log_pred_MVG = MVG_approach(DW, LTR, 0.5, DTEW, LTE)
-# # acc_MVG,_= accuracy(log_pred_MVG,LTE)
-# # inacc_MVG = 1-acc_MVG
-# # print("Error rate MVG LDA con ml = "+str(ml)+ " : "+ str(inacc_MVG*100))
-
-# log_pred_MVG = MVG_approach(DPW, LTR, 0.5, DTEPW, LTE)
-# acc_MVG,_= accuracy(log_pred_MVG,LTE)
-# inacc_MVG = 1-acc_MVG
-# print("Error rate MVG LDA + PCA con m = "+ str(mp)+ " : "+str(inacc_MVG*100))
-
-# print("------------------------")
-
-# ##NB
-# log_pred_NB = NB_approach(DTR, LTR, 0.5, DTE, LTE)
-# acc_NB,_= accuracy(log_pred_NB,LTE)
-# inacc_NB = 1-acc_NB
-# print("Error rate MVG_NB no PCA : "+str(inacc_NB*100))
-
-# log_pred_NB = NB_approach(DP, LTR, 0.5, DTEP, LTE)
-# acc_NB,_= accuracy(log_pred_NB,LTE)
-# inacc_NB = 1-acc_NB
-# print("Error rate MVG_NB PCA con m = "+ str(mp)+ " : "+str(inacc_NB*100))
-
-# log_pred_NB = NB_approach(DPW, LTR, 0.5, DTEPW, LTE)
-# acc_NB,_= accuracy(log_pred_NB,LTE)
-# inacc_NB = 1-acc_NB
-# print("Error rate MVG_NB LDA+PCA con m = "+ str(mp)+ " : "+str(inacc_NB*100))
-
-# print("------------------------")
-
-# #TCG
-# log_pred_TCG = TCG_approach(DTR, LTR, 0.5, DTE, LTE)
-# acc_TCG,_= accuracy(log_pred_TCG,LTE)
-# inacc_TCG = 1-acc_TCG
-# print("Error rate MVG_TCG no PCA : "+str(inacc_TCG*100))
-
-# log_pred_TCG = TCG_approach(DP, LTR, 0.5, DTEP, LTE)
-# acc_TCG,_= accuracy(log_pred_TCG,LTE)
-# inacc_TCG = 1-acc_TCG
-# print("Error rate MVG_TCG PCA con m = "+ str(mp)+ " : "+str(inacc_TCG*100))
 
 
-# log_pred_TCG = TCG_approach(DPW, LTR, 0.5, DTEPW, LTE)
-# acc_TCG,_= accuracy(log_pred_TCG,LTE)
-# inacc_TCG = 1-acc_TCG
-# print("Error rate MVG_TCG PCA + LDA con m = "+ str(mp)+ " : "+str(inacc_TCG*100))
 
-# print("------------------------")
-
-                    
-                ####################                    LOG REG                     ########################
-# logObj = logRegClass(DTR, LTR, 0.1)
-# logObj.train();
-# lp_pred,lg_llr = logObj.test(DTE)
-# acc,_ = accuracy(lp_pred,LTE)
-# DCF_min,_,_ = DCF_min_impl(lg_llr, LTE, prior, Cfp, Cfn)
-# print(100-acc*100)
-# print("LR DCF_min: "+str(DCF_min))
+#####################                       COST EVALUATION AND CALIBRATION         #######################
 
 
-#####################        COST EVALUATION AND CALIBRATION         #######################
-# prior,Cfp,Cfn = (0.5,10,1)
-# means,S_matrices,_ = MVG_model(DTR,LTR) #3 means and 3 S_matrices -> 1 for each class (3 classes)
-# ll0,ll1 = loglikelihoods(DTE,means,S_matrices)
-# llr = ll1-ll0
+                                                 ## ROC and Bayes error ###
 
-# #COSTS and CALIBRATION with DCF
+
 # post_prob = binary_posterior_prob(llr,prior,Cfn,Cfp)
-# DCF_norm = DCF_norm_impl(llr, LTE, prior, Cfp, Cfn)
-# print(DCF_norm)
-# DCF_min,t_min,thresholds = DCF_min_impl(llr, LTE, prior, Cfp, Cfn)
-# print("DCF_norm: "+str(DCF_norm))
-# print("DCF_min: "+str(DCF_min)+" con t: "+str(t_min))
-
-# #ROC and Bayes error
 # thresholds = np.sort(post_prob)
-# ROC_plot(thresholds, post_prob, LTE)
-# Bayes_DCF,Bayes_DCF_min = Bayes_plot(llr,LTE)
+# ROC_plot(thresholds,post_prob,label)
+
+                                            ##### CALIBRATE USING A LR #####
+                                            
+                                            ### BEST QUAD LOG REG ###
+# prior,Cfp,Cfn = (0.5,10,1)
+
+
+# l=0.01
+# pi_tilde=(prior * Cfn) / (prior * Cfn + (1 - prior) * Cfp)
+# QuadLogReg=quadLogRegClass(l, pi_tilde)
+
+# LogObj = LRCalibrClass(1e-2, 0.5)
+
+# options={"K":5,
+#           "pi":0.5,
+#           "pca":6,
+#           "costs":(1,10),
+#           "logCalibration":LogObj,
+#           "znorm":False}
+
+# DCF_effPrior,DCF_effPrior_min,lr_not_calibr_scores,lr_labels = kfold_calib(DTR,LTR,QuadLogReg,options,True)
+
+# post_prob = binary_posterior_prob(scores,pi,cfn,cfp)
+# thresholds = np.sort(post_prob)
+# lr_FPR,lr_TPR = ROC_plot(thresholds,post_prob,labels)
+
+# DCF_effPrior = {-3.0: 0.4199709704927474, -2.7: 0.34309361470383404, -2.4: 0.2727180609497317, -2.1: 0.2753070413616317, -1.8: 0.24085851248468823, -1.5: 0.20404200016447085, -1.2000000000000002: 0.17805365648606708, -0.8999999999999999: 0.14919130695948832, -0.6000000000000001: 0.12082609601357178, -0.30000000000000027: 0.1060755788345864, 0.0: 0.08936475409836064, 0.2999999999999998: 0.1030707357997773, 0.5999999999999996: 0.12293001919009058, 0.8999999999999999: 0.1534975411030923, 1.2000000000000002: 0.16892171827903718, 1.5: 0.18818060176632873, 1.7999999999999998: 0.21035361594185878, 2.0999999999999996: 0.23866710148906534, 2.3999999999999995: 0.2505341966413051, 2.7: 0.3002114380345536, 3.0: 0.30417322247834744}
+# DCF_effPrior_min = {-3.0: 0.34747097049274733, -2.7: 0.303093614703834, -2.4: 0.27021806094973166, -2.1: 0.24496811723012926, -1.8: 0.22553774721428277, -1.5: 0.20066437515419147, -1.2000000000000002: 0.17103341839971403, -0.8999999999999999: 0.14173128845332347, -0.6000000000000001: 0.11957609601357178, -0.30000000000000027: 0.10196073215102967, 0.0: 0.08590163934426229, 0.2999999999999998: 0.09951215766990303, 0.5999999999999996: 0.11336952206860416, 0.8999999999999999: 0.13169719600313934, 1.2000000000000002: 0.15578980831431538, 1.5: 0.18091080531999174, 1.7999999999999998: 0.1985503372533342, 2.0999999999999996: 0.22236121479507462, 2.3999999999999995: 0.2439768195921248, 2.7: 0.26808029049356996, 3.0: 0.29827158313408514}
+                                           
+                                            ### BEST SVM  ###
+
+# prior,Cfp,Cfn = (0.5,10,1)
+# K_svm = 0
+# C=10
+# mode="rbf"
+# gamma = 1e-3
+# pi_tilde=(prior * Cfn) / (prior * Cfn + (1 - prior) * Cfp)
+# SVMObj=SVMClass(K_svm, C, pi_tilde, mode, gamma) 
+
+# LogObj = LRCalibrClass(1e-2, 0.5)
+
+# options={"K":5,
+#           "pi":0.5,
+#           "pca":6,
+#           "costs":(1,10),
+#           "logCalibration":LogObj,
+#           "znorm":False}
+
+
+# DCF_effPrior,DCF_effPrior_min,svm_not_calibr_scores,svm_labels = kfold_calib(DTR,LTR,SVMObj,options,True)
+# DCF_effPrior = {-3.0: 0.4461292827246323, -2.7: 0.36958641357276983, -2.4: 0.3281529980919774, -2.1: 0.28424244481231825, -1.8: 0.23749058470917883, -1.5: 0.21529200016447086, -1.2000000000000002: 0.17587653063509226, -0.8999999999999999: 0.148828452460369, -0.6000000000000001: 0.12810542401459604, -0.30000000000000027: 0.11138649873324608, 0.0: 0.09407786885245903, 0.2999999999999998: 0.10766089973420354, 0.5999999999999996: 0.12362062382845856, 0.8999999999999999: 0.1455423210481037, 1.2000000000000002: 0.13747204224251325, 1.5: 0.1578466222633834, 1.7999999999999998: 0.17744027635220427, 2.0999999999999996: 0.1905355812431686, 2.3999999999999995: 0.21705765900039217, 2.7: 0.25663245154133696, 3.0: 0.2721311475409836}
+# DCF_effPrior_min = {-3.0: 0.4048792827246324, -2.7: 0.347644022621283, -2.4: 0.2970662476149718, -2.1: 0.25959731032875605, -1.8: 0.23183963887754683, -1.5: 0.20005250020558862, -1.2000000000000002: 0.16857491499581492, -0.8999999999999999: 0.1420541614586076, -0.6000000000000001: 0.1222967680125475, -0.30000000000000027: 0.10539981225237001, 0.0: 0.0901844262295082, 0.2999999999999998: 0.10391040461562957, 0.5999999999999996: 0.11571690443599221, 0.8999999999999999: 0.12947088010046864, 1.2000000000000002: 0.13484909142284116, 1.5: 0.1421089173453506, 1.7999999999999998: 0.15190865730831868, 2.0999999999999996: 0.16513692260928553, 2.3999999999999995: 0.1816478229348184, 2.7: 0.18646851711510745, 3.0: 0.19297577361300108}
+# post_prob = binary_posterior_prob(svm_not_calibr_scores,prior,Cfn,Cfp)
+# thresholds = np.sort(post_prob)
+# svm_FPR,svm_TPR = ROC_plot(thresholds,post_prob,svm_labels)
+
+                                            ### BEST GMM  ###
+prior,Cfp,Cfn = (0.5,10,1)
+target_max_comp=2
+not_target_max_comp=8
+mode_target="diag"
+mode_not_target="diag"
+psi=0.01
+alpha=0.1
+pca=None
+pi_tilde=(prior * Cfn) / (prior * Cfn + (1 - prior) * Cfp)
+
+GMMObj = GMMClass(target_max_comp, not_target_max_comp, mode_target, mode_not_target, psi, alpha, prior, Cfp, Cfn)
+
+LogObj = LRCalibrClass(1e-2, 0.5)
+
+options={"K":5,
+          "pi":0.5,
+          "pca":pca,
+          "costs":(1,10),
+          "logCalibration":LogObj,
+          "znorm":False}      
+
+DCF_effPrior,DCF_effPrior_min,gmm_not_calibr_scores,gmm_labels = kfold_calib(DTR,LTR,GMMObj,options,True)
+
+
+post_prob = binary_posterior_prob(gmm_not_calibr_scores,prior,Cfn,Cfp)
+thresholds = np.sort(post_prob)
+gmm_FPR,gmm_TPR = ROC_plot(thresholds,post_prob,gmm_labels)                                  
+
+
+
 
 
 

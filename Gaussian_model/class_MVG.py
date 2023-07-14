@@ -3,13 +3,16 @@ import numpy as np
 
 class GaussClass:
     
-    def __init__(self,mode):
+    def __init__(self,mode,prior,Cfp,Cfn):
        
         self.means = 0
+        self.eff_prior=0
         self.S_matrices = 0
         self.ll0 = 0
         self.ll1 = 0
         self.mode = mode
+        self.eff_prior = (prior*Cfn)/(prior*Cfn + (1-prior)*Cfp)
+        
         
     def name(self):
         return self.mode
@@ -37,9 +40,10 @@ class GaussClass:
         self.S_matrices = S_matrices
         
     def compute_scores(self,DTE):
-        self.ll0,self.ll1 = m.loglikelihoods(DTE,self.means,self.S_matrices)
-        llr = self.ll1-self.ll0
-        return llr
+        
+       llr = m.loglikelihoods(DTE,self.means,self.S_matrices, [1-self.eff_prior,self.eff_prior])
+        
+       return llr
     
     # def predict(self,Pc):
         

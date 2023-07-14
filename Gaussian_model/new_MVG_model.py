@@ -2,6 +2,10 @@ from . import MVG_density as MVGd
 import numpy as np
 import scipy as sc
 
+def vrow(v):
+    return v.reshape((1,v.size))
+def vcol(v):
+    return v.reshape((v.size,1))
 
 def MVG_model(D,L):
     c0 = []
@@ -52,18 +56,31 @@ def TCG_model(D,L):
     S_matrix /=D.shape[1]
     
     return means,S_matrix
-    
 
-def loglikelihoods(DTE,means,S_matrices):
-    ll0 = []
-    ll1 = []
-    for i in range(DTE.shape[1]):
-            ll0.append(MVGd.loglikelihood(DTE[:,i:i+1] , means[0], S_matrices[0]))
+def loglikelihoods(DTE,means,S_matrices,prior):
+    likelihoods=[]
+    logSJoint=[]
+    logSMarginal=0
+    for i in range(2):
+        mu=means[i]
+        c=S_matrices[i]
+        ll=MVGd.logpdf_GAU_ND(DTE, mu, c)
+        likelihoods.append(ll)
+        logSJoint.append(ll+np.log(prior[i]))
         
-            ll1.append(MVGd.loglikelihood(DTE[:,i:i+1], means[1], S_matrices[1]))
+    logSMarginal = vrow(sc.special.logsumexp(logSJoint, axis=0))
+    logSPost = logSJoint - logSMarginal
+    llr = logSPost[1,:] - logSPost[0,:] - np.log(prior[1]/prior[0])
+    
+    # ll0 = []
+    # ll1 = []
+    # for i in range(DTE.shape[1]):
+    #         ll0.append(MVGd.loglikelihood(DTE[:,i:i+1] , means[0], S_matrices[0]))
+        
+    #         ll1.append(MVGd.loglikelihood(DTE[:,i:i+1], means[1], S_matrices[1]))
              
     
-    return np.array((ll0, ll1))
+    return llr
 
 
 def posterior_prob(SJoint):
