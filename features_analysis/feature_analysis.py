@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 def mcol(v):
     return v.reshape((v.size, 1))
@@ -30,7 +31,7 @@ def loadFile(fname):
 def plotSingle(D, L, m):
     D0 = D[:, L == 0]
     D1 = D[:, L == 1]
-
+    print(m)
     for i in range(m):
         plt.figure()
         plt.xlabel("Feature " + str(i))
@@ -76,72 +77,148 @@ def stats(D, L):
     return DC
 
 
-def pearson_correlation(x, y):
-    # Calcola la media di x e y
-    mean_x = np.mean(x)
-    mean_y = np.mean(y)
+# def pearson_correlation(x, y):
+#     # Calcola la media di x e y
+#     mean_x = np.mean(x)
+#     mean_y = np.mean(y)
 
-    # Calcola le differenze tra x e la media di x, e tra y e la media di y
-    diff_x = x - mean_x
-    diff_y = y - mean_y
+#     # Calcola le differenze tra x e la media di x, e tra y e la media di y
+#     diff_x = x - mean_x
+#     diff_y = y - mean_y
 
-    # Calcola il prodotto delle differenze
-    diff_prod = diff_x * diff_y
+#     # Calcola il prodotto delle differenze
+#     diff_prod = diff_x * diff_y
 
-    # Calcola la somma dei quadrati delle differenze
-    sum_diff_squares = np.sqrt(np.sum(diff_x**2) * np.sum(diff_y**2))
+#     # Calcola la somma dei quadrati delle differenze
+#     sum_diff_squares = np.sqrt(np.sum(diff_x**2) * np.sum(diff_y**2))
 
-    # Calcola la correlazione di Pearson
-    correlation = np.sum(diff_prod) / sum_diff_squares
+#     # Calcola la correlazione di Pearson
+#     correlation = np.sum(diff_prod) / sum_diff_squares
 
-    return correlation
+#     return correlation
 
-def plot_pearson_correlation(data, labels, target_class):
-    target_data = data[:,labels == target_class]
-    non_target_data = data[:,labels != target_class]
+# def plot_pearson_correlation(data, labels, target_class):
+#     target_data = data[:,labels == target_class]
+#     non_target_data = data[:,labels != target_class]
 
-    num_features = data.shape[0]
-    correlations_target = np.zeros((num_features, num_features))
-    correlations_non_target = np.zeros((num_features, num_features))
+#     num_features = data.shape[0]
+#     correlations_target = np.zeros((num_features, num_features))
+#     correlations_non_target = np.zeros((num_features, num_features))
 
-    for i in range(num_features):
-        for j in range(num_features):
-            correlations_target[i, j] = pearson_correlation(target_data[:, i], target_data[:, j])
-            correlations_non_target[i, j] = pearson_correlation(non_target_data[:, i], non_target_data[:, j])
+#     for i in range(num_features):
+#         for j in range(num_features):
+#             correlations_target[i, j] = pearson_correlation(target_data[:, i], target_data[:, j])
+#             correlations_non_target[i, j] = pearson_correlation(non_target_data[:, i], non_target_data[:, j])
 
-    fig, axs = plt.subplots(1, 2, figsize=(10, 6))
-    im1= axs[0].matshow(correlations_target, cmap='coolwarm', vmin=-1, vmax=1)
-    axs[0].set_title('Target Class')
-    im2= axs[1].matshow(correlations_non_target, cmap='coolwarm', vmin=-1, vmax=1)
-    axs[1].set_title('Non-Target Class')
-    fig.colorbar(im1, ax=axs[0])
-    fig.colorbar(im2, ax=axs[1])
-    fig.suptitle('Pearson Correlation Coefficient')
-    plt.show()
-
-def Pearson_corr(D,L):
-
-    # Suddividere la matrice dei dati in base alle etichette di classe
-    X_target = D[:,L == 1]
-    X_non_target = D[:,L == 0]
+#     fig, axs = plt.subplots(1, 2, figsize=(10, 6))
+#     im1= axs[0].matshow(correlations_target, cmap='coolwarm', vmin=-1, vmax=1)
+#     axs[0].set_title('Target Class')
+#     im2= axs[1].matshow(correlations_non_target, cmap='coolwarm', vmin=-1, vmax=1)
+#     axs[1].set_title('Non-Target Class')
+#     fig.colorbar(im1, ax=axs[0])
+#     fig.colorbar(im2, ax=axs[1])
+#     fig.suptitle('Pearson Correlation Coefficient')
+#     plt.show()
     
-    # Calcolare il coefficiente di correlazione di Pearson per la classe target
-    corr_target = np.corrcoef(X_target, rowvar=False)
+def plot_features(DTR, LTR, m=2, appendToTitle=''):
+     plot_correlations(DTR, "heatmap_" + appendToTitle)
+     plot_correlations(DTR[:, LTR == 0], "heatmap_male_" + appendToTitle, cmap="Blues")
+     plot_correlations(DTR[:, LTR == 1], "heatmap_female_" + appendToTitle, cmap="Reds")
+    # matplotlib.rcParams.update(matplotlib.rcParamsDefault)
     
-    # Calcolare il coefficiente di correlazione di Pearson per la classe non target
-    corr_non_target = np.corrcoef(X_non_target, rowvar=False)
+# def plot_heatmap(D, L):
+
+#     D0 = D[:, L==0]
+#     D1 = D[:, L==1]
     
-    # Creare un grafico a matrice per la classe target
-    plt.matshow(corr_target, cmap='coolwarm', vmin=-1, vmax=1)
-    plt.title('Coefficienti di correlazione di Pearson - Classe target')
-    plt.colorbar()
-    plt.show()
+
+#     hFea = {
+#         0: 'Feature_0',
+#         1: 'Feature_1',
+#         2: 'Feature_2',
+#         3: 'Feature_3',
+#         4: 'Feature_4',
+#         5: 'Feature_5',
+#         6: 'Feature_6',
+#         7: 'Feature_7',
+#         8: 'Feature_8',
+#         9: 'Feature_9',
+#         }
+#     # calculate Pearson correlation matrix
+#     corr_matrix = np.corrcoef(D1)
     
-    # Creare un grafico a matrice per la classe non target
-    plt.matshow(corr_non_target, cmap='coolwarm', vmin=-1, vmax=1)
-    plt.title('Coefficienti di correlazione di Pearson - Classe non target')
-    plt.colorbar()
-    plt.show()
+#     fig, ax = plt.subplots(figsize=(12, 12))
+#     plt.imshow(corr_matrix, cmap='seismic')
+#     plt.colorbar()
+    
+#     # set tick labels for x and y axes
+#     ax.set_xticks(np.arange(len(corr_matrix)))
+#     ax.set_yticks(np.arange(len(corr_matrix)))
+#     ax.set_xticklabels(np.arange(len(corr_matrix)))
+#     ax.set_yticklabels(np.arange(len(corr_matrix)))
+    
+#     plt.title('Pearson Correlation Heatmap - \'Authentic fingerprints\' training set')    
+        
+        
+#     plt.legend()
+#     plt.tight_layout()
+#     plt.savefig('heatmap_training_set_authentic.png',dpi=300)
+#     plt.show()    
+
+def compute_correlation(X, Y):
+    x_sum = np.sum(X)
+    y_sum = np.sum(Y)
+
+    x2_sum = np.sum(X ** 2)
+    y2_sum = np.sum(Y ** 2)
+
+    sum_cross_prod = np.sum(X * Y.T)
+
+    n = X.shape[0]
+    numerator = n * sum_cross_prod - x_sum * y_sum
+    denominator = np.sqrt((n * x2_sum - x_sum ** 2) * (n * y2_sum - y_sum ** 2))
+
+    corr = numerator / denominator
+    return corr
+
+
+def plot_correlations(DTR, title, cmap="Greys"):
+    corr = np.zeros((10, 10))
+    for x in range(10):
+        for y in range(10):
+            X = DTR[x, :]
+            Y = DTR[y, :]
+            pearson_elem = compute_correlation(X, Y)
+            corr[x][y] = pearson_elem
+
+    sns.set()
+    heatmap = sns.heatmap(np.abs(corr), linewidth=0.2, cmap=cmap, square=True, cbar=False)
+    fig = heatmap.get_figure()
+    # fig.savefig("./images/" + title + ".svg")
+
+# def Pearson_corr(D,L):
+
+#     # Suddividere la matrice dei dati in base alle etichette di classe
+#     X_target = D[:,L == 1]
+#     X_non_target = D[:,L == 0]
+    
+#     # Calcolare il coefficiente di correlazione di Pearson per la classe target
+#     corr_target = np.corrcoef(X_target, rowvar=False)
+    
+#     # Calcolare il coefficiente di correlazione di Pearson per la classe non target
+#     corr_non_target = np.corrcoef(X_non_target, rowvar=False)
+    
+#     # Creare un grafico a matrice per la classe target
+#     plt.matshow(corr_target, cmap='coolwarm', vmin=-1, vmax=1)
+#     plt.title('Coefficienti di correlazione di Pearson - Classe target')
+#     plt.colorbar()
+#     plt.show()
+    
+#     # Creare un grafico a matrice per la classe non target
+#     plt.matshow(corr_non_target, cmap='coolwarm', vmin=-1, vmax=1)
+#     plt.title('Coefficienti di correlazione di Pearson - Classe non target')
+#     plt.colorbar()
+#     plt.show()
 
 
 

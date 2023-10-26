@@ -119,6 +119,7 @@ class LRCalibrClass:
 def kfold_calib(D, L,classifier, options,calibrated=False):
         
         K = options["K"]
+        K=2
         pi = options["pi"]
         (cfn, cfp) = options["costs"]
         pca=options["pca"]
@@ -139,6 +140,7 @@ def kfold_calib(D, L,classifier, options,calibrated=False):
         
             
         for i in range(K):
+            print("K fold: "+str(i))
             idxTest = indexes[i*N:(i+1)*N]
             
             idxTrainLeft = indexes[0:i*N]
@@ -165,7 +167,10 @@ def kfold_calib(D, L,classifier, options,calibrated=False):
         #plot the Bayes error BEFORE calibration   
         labels=np.array(labels,dtype=int)
         DCF_effPrior,DCF_effPrior_min = Bayes_plot(scores, labels)
-        
+        DCF_effPrior_return = DCF_effPrior
+        DCF_effPrior_min_return = DCF_effPrior_min 
+        print(DCF_effPrior)
+        print(DCF_effPrior_min)
         #plot the ROC BEFORE calibration
         # post_prob = binary_posterior_prob(scores,pi,cfn,cfp)
         # thresholds = np.sort(post_prob)
@@ -187,5 +192,7 @@ def kfold_calib(D, L,classifier, options,calibrated=False):
         print("final score: ")
         print(final_score)
         DCF_effPrior,DCF_effPrior_min = Bayes_plot(final_score, labels)
-        return DCF_effPrior,DCF_effPrior_min,scores,labels
+        print(DCF_effPrior)
+        print(DCF_effPrior_min)
+        return DCF_effPrior_return,DCF_effPrior_min_return,scores,final_score,labels
         
